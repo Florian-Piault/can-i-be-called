@@ -13,9 +13,7 @@
         :model-config="modelConfig"
         is24hr
       />
-      <ion-button @click="addDate()">
-        <ion-icon name="add-circle-outline"></ion-icon>
-      </ion-button>
+      <ion-button @click="addDate()"> + </ion-button>
     </div>
   </ion-content>
   <ion-button @click="close()">Close</ion-button>
@@ -23,13 +21,11 @@
 
 <script>
 import { Calendar, DatePicker } from "v-calendar";
-import addCircleOutline from "ionicons/icons";
 import {
   IonContent,
   IonHeader,
   IonTitle,
   IonToolbar,
-  IonIcon,
   modalController,
 } from "@ionic/vue";
 export default {
@@ -40,7 +36,6 @@ export default {
     IonHeader,
     IonTitle,
     IonToolbar,
-    IonIcon,
     // Calendar,
     DatePicker,
   },
@@ -59,7 +54,6 @@ export default {
       modelConfig: {
         type: "number",
         mask: "iso",
-        timeAdjust: "12:00:00",
       },
     };
   },
