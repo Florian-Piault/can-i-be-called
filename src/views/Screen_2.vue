@@ -33,6 +33,9 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
+  IonCard,
+  IonCardTitle,
+  IonCardContent,
   modalController,
 } from "@ionic/vue";
 import { IonSlides, IonSlide } from "@ionic/vue";
@@ -54,6 +57,9 @@ export default {
     IonTitle,
     IonContent,
     IonPage,
+    IonCard,
+    IonCardTitle,
+    IonCardContent,
   },
   setup() {
     // Optional parameters to pass to the swiper instance. See http://idangero.us/swiper/api/ for valid options.
