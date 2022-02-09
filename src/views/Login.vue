@@ -3,89 +3,82 @@
     <!-- HEADER -->
     <ion-header>
       <ion-toolbar>
-        <ion-title></ion-title>
+        <ion-title>placeholder: App name</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content class="wrapper">
-      <!-- mettre au milieu + bouton style -->
-      <ion-card class="card">
-        <form @submit.prevent="onSumbit" class="login-card" action="post">
-          <!-- login -->
-          <div v-show="toLogin">
-            <ion-card-title>Log in</ion-card-title>
-            <ion-card-content>
-              <ion-item class="field">
-                <ion-input
-                  clear-input="true"
-                  inputmode="email"
-                  type="email"
-                  v-model="mail"
-                  placeholder="Email"
-                  required
-                ></ion-input>
-              </ion-item>
-
-              <ion-item class="field">
-                <ion-input
-                  clear-input="true"
-                  type="password"
-                  v-model="password"
-                  placeholder="Password"
-                  required
-                ></ion-input>
-              </ion-item>
-            </ion-card-content>
-            <ion-item>
-              <button type="submit">Log in</button>
+    <ion-content>
+      <ion-card class="wrapper">
+        <!-- login -->
+        <form @submit.prevent="onSumbit" action="post" v-show="toLogin">
+          <ion-card-title class="card-title">Login</ion-card-title>
+          <ion-card-content>
+            <ion-item class="field">
+              <ion-input
+                clear-input="true"
+                inputmode="email"
+                type="email"
+                v-model="mail"
+                placeholder="Email"
+              ></ion-input>
             </ion-item>
-          </div>
-          <!-- register -->
-          <div v-show="!toLogin">
-            <ion-card-title>Register</ion-card-title>
-            <ion-card-content>
-              <ion-item class="field">
-                <ion-input
-                  clear-input="true"
-                  inputmode="email"
-                  type="mail"
-                  v-model="mail"
-                  placeholder="Email"
-                  required
-                ></ion-input>
-              </ion-item>
-              <ion-item class="field">
-                <ion-input
-                  clear-input="true"
-                  type="password"
-                  v-model="password"
-                  placeholder="Password"
-                  required
-                ></ion-input>
-              </ion-item>
-
-              <ion-item class="field">
-                <ion-input
-                  clear-input="true"
-                  type="password"
-                  v-model="cPassword"
-                  placeholder="Confirm password"
-                  required
-                ></ion-input>
-              </ion-item>
-            </ion-card-content>
-            <ion-item>
-              <button type="submit">Register</button>
+            <ion-item class="field">
+              <ion-input
+                clear-input="true"
+                type="password"
+                v-model="password"
+                placeholder="Password"
+              ></ion-input>
             </ion-item>
-          </div>
-
-          <!-- switch mode login/register -->
-          <ion-card-subtitle v-if="toLogin">
+          </ion-card-content>
+          <ion-item>
+            <ion-button type="submit" fill="solid">Login</ion-button>
+          </ion-item>
+          <ion-card-subtitle class="card-subtitle">
             You already have an account ?
-            <button @click="swapMode">login here</button>
+            <ion-button @click="swapMode" fill="clear">login here</ion-button>
           </ion-card-subtitle>
-          <ion-card-subtitle v-else>
+        </form>
+        <!-- register -->
+        <form @submit.prevent="onSumbit" action="post" v-show="!toLogin">
+          <ion-card-title class="card-title">Register</ion-card-title>
+          <ion-card-content>
+            <ion-item class="field">
+              <ion-input
+                clear-input="true"
+                inputmode="email"
+                type="mail"
+                v-model="mail"
+                placeholder="Email"
+                required
+              ></ion-input>
+            </ion-item>
+            <ion-item class="field">
+              <ion-input
+                clear-input="true"
+                type="password"
+                v-model="password"
+                placeholder="Password"
+                required
+              ></ion-input>
+            </ion-item>
+            <ion-item class="field">
+              <ion-input
+                clear-input="true"
+                type="password"
+                v-model="cPassword"
+                placeholder="Confirm password"
+                required
+              ></ion-input>
+            </ion-item>
+          </ion-card-content>
+          <ion-item>
+            <ion-button type="submit" fill="solid">Register</ion-button>
+          </ion-item>
+          <ion-card-subtitle class="card-subtitle">
             You don't have an account yet ?
-            <button @click="swapMode">register here</button>
+            <ion-button @click="swapMode" fill="clear"
+              >register here</ion-button
+            >
           </ion-card-subtitle>
         </form>
       </ion-card>
@@ -106,6 +99,7 @@ import {
   IonCardContent,
   IonItem,
   IonInput,
+  IonButton,
 } from "@ionic/vue";
 export default {
   name: "Login",
@@ -121,6 +115,7 @@ export default {
     IonCardContent,
     IonItem,
     IonInput,
+    IonButton,
   },
   data() {
     return {
@@ -133,6 +128,7 @@ export default {
   methods: {
     onSumbit(): void {
       console.log(this.mail, this.password);
+      this.$root.setNotif();
     },
     swapMode(): void {
       this.password = "";
@@ -144,4 +140,36 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+@media screen and (min-width: 700px) {
+  .wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 540px;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@media screen and (max-width: 699px) {
+  .wrapper {
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    right: 10%;
+    transform: translateY(-50%);
+  }
+}
+
+.card-title {
+  border-bottom: 1px solid var(--ion-color-medium);
+  padding: 1em 0.5em;
+  font-size: 1.2rem;
+}
+
+.card-subtitle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+</style>

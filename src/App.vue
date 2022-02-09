@@ -5,14 +5,23 @@
 </template>
 
 <script lang="ts">
-import { IonApp, IonRouterOutlet } from '@ionic/vue';
-import { defineComponent } from 'vue';
+import { IonApp, IonRouterOutlet, toastController } from "@ionic/vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: 'App',
+  name: "App",
   components: {
     IonApp,
-    IonRouterOutlet
-  }
+    IonRouterOutlet,
+  },
+  methods: {
+    async setNotif() {
+      const toast = await toastController.create({
+        message: "Your settings have been saved.",
+        duration: 2000,
+      });
+      return toast.present();
+    },
+  },
 });
 </script>
