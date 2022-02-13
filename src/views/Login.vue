@@ -9,24 +9,32 @@
     <ion-content>
       <ion-card class="wrapper">
         <!-- login -->
-        <form @submit.prevent="onSumbit" action="post" v-show="toLogin">
+        <form
+          @submit.prevent="onSubmit('login')"
+          action="post"
+          v-show="toLogin"
+        >
           <ion-card-title class="card-title">Login</ion-card-title>
           <ion-card-content>
             <ion-item class="field">
+              <ion-label position="floating" color="primary">E-mail</ion-label>
               <ion-input
                 clear-input="true"
                 inputmode="email"
                 type="email"
                 v-model="mail"
-                placeholder="Email"
+                required
               ></ion-input>
             </ion-item>
             <ion-item class="field">
+              <ion-label position="floating" color="primary"
+                >Password</ion-label
+              >
               <ion-input
                 clear-input="true"
                 type="password"
                 v-model="password"
-                placeholder="Password"
+                required
               ></ion-input>
             </ion-item>
           </ion-card-content>
@@ -34,39 +42,49 @@
             <ion-button type="submit" fill="solid">Login</ion-button>
           </ion-item>
           <ion-card-subtitle class="card-subtitle">
-            You already have an account ?
-            <ion-button @click="swapMode" fill="clear">login here</ion-button>
+            You don't have an account yet ?
+            <ion-button @click="swapMode" fill="clear"
+              >register here</ion-button
+            >
           </ion-card-subtitle>
         </form>
         <!-- register -->
-        <form @submit.prevent="onSumbit" action="post" v-show="!toLogin">
+        <form
+          @submit.prevent="onSubmit('register')"
+          action="post"
+          v-show="!toLogin"
+        >
           <ion-card-title class="card-title">Register</ion-card-title>
           <ion-card-content>
             <ion-item class="field">
+              <ion-label position="floating" color="primary">E-mail</ion-label>
               <ion-input
                 clear-input="true"
                 inputmode="email"
                 type="mail"
                 v-model="mail"
-                placeholder="Email"
                 required
               ></ion-input>
             </ion-item>
             <ion-item class="field">
+              <ion-label position="floating" color="primary"
+                >Password</ion-label
+              >
               <ion-input
                 clear-input="true"
                 type="password"
                 v-model="password"
-                placeholder="Password"
                 required
               ></ion-input>
             </ion-item>
             <ion-item class="field">
+              <ion-label position="floating" color="primary"
+                >Confirm password</ion-label
+              >
               <ion-input
                 clear-input="true"
                 type="password"
                 v-model="cPassword"
-                placeholder="Confirm password"
                 required
               ></ion-input>
             </ion-item>
@@ -75,10 +93,8 @@
             <ion-button type="submit" fill="solid">Register</ion-button>
           </ion-item>
           <ion-card-subtitle class="card-subtitle">
-            You don't have an account yet ?
-            <ion-button @click="swapMode" fill="clear"
-              >register here</ion-button
-            >
+            You already have an account ?
+            <ion-button @click="swapMode" fill="clear">login here</ion-button>
           </ion-card-subtitle>
         </form>
       </ion-card>
@@ -99,8 +115,12 @@ import {
   IonCardContent,
   IonItem,
   IonInput,
+  IonLabel,
   IonButton,
 } from "@ionic/vue";
+import { useGlobalMethods } from "@/composition/useGlobalMethods";
+import { useLoginMethods } from "@/composition/useLoginMethods";
+import { Ref, ref } from "vue";
 export default {
   name: "Login",
   components: {
@@ -115,27 +135,23 @@ export default {
     IonCardContent,
     IonItem,
     IonInput,
+    IonLabel,
     IonButton,
   },
-  data() {
+  setup() {
+    const mail: Ref<string> = ref("");
+    const password: Ref<string> = ref("");
+    const cPassword: Ref<string> = ref("");
+    const toLogin: Ref<boolean> = ref(true);
+    const { setToast } = useGlobalMethods();
+
     return {
-      mail: "",
-      password: "",
-      cPassword: "",
-      toLogin: true,
+      mail,
+      password,
+      cPassword,
+      toLogin,
+      ...useLoginMethods({ mail, password, cPassword, toLogin }, setToast),
     };
-  },
-  methods: {
-    onSumbit(): void {
-      console.log(this.mail, this.password);
-      this.$root.setNotif();
-    },
-    swapMode(): void {
-      this.password = "";
-      this.cPassword = "";
-      this.mail = "";
-      this.toLogin = !this.toLogin;
-    },
   },
 };
 </script>

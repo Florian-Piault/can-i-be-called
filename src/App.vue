@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { IonApp, IonRouterOutlet, toastController } from "@ionic/vue";
+import { IonApp, IonRouterOutlet } from "@ionic/vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -13,15 +13,6 @@ export default defineComponent({
   components: {
     IonApp,
     IonRouterOutlet,
-  },
-  methods: {
-    async setNotif() {
-      const toast = await toastController.create({
-        message: "Your settings have been saved.",
-        duration: 2000,
-      });
-      return toast.present();
-    },
   },
 });
 </script>
