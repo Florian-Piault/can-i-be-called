@@ -133,7 +133,8 @@ export default {
       const modal = await modalController.create({
         component: Schedule,
         cssClass: "my-custom-class",
-        swipeToClose: true,
+        swipeToClose: false,
+        backdropDismiss: false,
         componentProps: {
           id: shop.id,
           title: shop.name,
@@ -144,7 +145,7 @@ export default {
       await modal.present();
 
       const { data } = await modal.onDidDismiss();
-      this.currentShop.schedule = data.schedule;
+      if (data) this.currentShop.schedule.push(data.schedule).flat();
       this.currentShop = null;
     },
   },
