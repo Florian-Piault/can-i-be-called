@@ -7,11 +7,9 @@
     </ion-header>
     <ion-content>
       <!-- Item as a Button -->
-      <template v-for="param in params" :key="param.label">
-        <ion-item button @click="buttonClick()">
-          <ion-label> {{ param.label }} </ion-label>
-        </ion-item>
-      </template>
+      <ion-item button @click="logOut">
+        <ion-label> Sign out </ion-label>
+      </ion-item>
     </ion-content>
   </ion-page>
 </template>
@@ -23,9 +21,12 @@ import {
   IonHeader,
   IonToolbar,
   IonTitle,
+  IonLabel,
   IonContent,
 } from "@ionic/vue";
-// import ExploreContainer from "@/components/ExploreContainer.vue";
+import { useLogoutMethods } from "@/composition/useLogoutMethods";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 export default {
   name: "Parameters",
@@ -36,20 +37,14 @@ export default {
     IonTitle,
     IonContent,
     IonPage,
+    IonLabel,
   },
-  data() {
-    return {
-      params: [
-        { label: "param1", fct: "paramFct" },
-        { label: "param1", fct: "paramFct" },
-        { label: "param3", fct: "paramFct" },
-      ],
-    };
-  },
-  methods: {
-    buttonClick() {
-      this.params.push({ label: "param", fct: "paramFct" });
-    },
+  setup() {
+    const store = useStore();
+    const router = useRouter();
+    const { logOut } = useLogoutMethods(store, router);
+
+    return { logOut };
   },
 };
 </script>

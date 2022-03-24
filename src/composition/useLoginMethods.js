@@ -52,7 +52,5 @@ export function useLoginMethods(
     }
   };
 
-  // const signOutWithGoogle
-
   return { swapMode, onSubmit, authWithGoogle };
 }
