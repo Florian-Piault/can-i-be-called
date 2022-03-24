@@ -3,7 +3,7 @@
     <!-- HEADER -->
     <ion-header>
       <ion-toolbar>
-        <ion-title>placeholder: App name</ion-title>
+        <ion-title>Can I Be Called</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
@@ -41,6 +41,17 @@
           <ion-item>
             <ion-button type="submit" fill="solid">Login</ion-button>
           </ion-item>
+          <ion-item>
+            <div class="google-btn" @click="authWithGoogle">
+              <div class="google-icon-wrapper">
+                <img
+                  class="google-icon"
+                  src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+                />
+              </div>
+              <p class="btn-text"><b>Sign in with google</b></p>
+            </div>
+          </ion-item>
           <ion-card-subtitle class="card-subtitle">
             You don't have an account yet ?
             <ion-button @click="swapMode" fill="clear"
@@ -61,7 +72,7 @@
               <ion-input
                 clear-input="true"
                 inputmode="email"
-                type="mail"
+                type="email"
                 v-model="mail"
                 required
               ></ion-input>
@@ -187,5 +198,82 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+@media screen and (min-width: 700px) {
+  .google-btn {
+    cursor: pointer;
+    width: 184px;
+    height: 42px;
+    background-color: #4285f4;
+    border-radius: 2px;
+    box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.25);
+  }
+
+  .google-btn:hover {
+    box-shadow: 0 0 6px #4285f4;
+  }
+  .google-btn:active {
+    background: #1669f2;
+  }
+  .google-icon-wrapper {
+    position: absolute;
+    margin-top: 1px;
+    margin-left: 1px;
+    width: 40px;
+    height: 40px;
+    border-radius: 2px;
+    background-color: #fff;
+  }
+  .google-icon {
+    position: absolute;
+    margin-top: 11px;
+    margin-left: 11px;
+    width: 18px;
+    height: 18px;
+  }
+  .btn-text {
+    float: right;
+    margin: 11px 11px 0 0;
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+  }
+}
+@media screen and (max-width: 699px) {
+  .google-btn {
+    cursor: pointer;
+    width: 42px;
+    height: 42px;
+    background-color: #4285f4;
+    border-radius: 1000px;
+    box-shadow: 4px 2px 5px 0 rgba(0, 0, 0, 0.25);
+  }
+
+  .google-btn:hover {
+    box-shadow: 4px 2px 5px 0px #4285f4;
+  }
+  .google-btn:active {
+    background: #1669f2;
+  }
+  .google-icon-wrapper {
+    position: absolute;
+    margin-top: 1px;
+    margin-left: 1px;
+    width: 40px;
+    height: 40px;
+    border-radius: 1000px;
+    background-color: #fff;
+  }
+  .google-icon {
+    position: absolute;
+    margin-top: 11px;
+    margin-left: 11px;
+    width: 18px;
+    height: 18px;
+  }
+  .btn-text {
+    display: none;
+  }
 }
 </style>

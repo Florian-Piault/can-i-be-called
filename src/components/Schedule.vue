@@ -75,6 +75,7 @@ export default {
 
     const close = () => {
       if (!tmpStart.value || !tmpEnd.value) return modalController.dismiss();
+      // todo fdfdfdfdf
       else modalController.dismiss(tmpSchedule.value);
     };
 
