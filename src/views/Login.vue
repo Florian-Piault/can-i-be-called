@@ -132,6 +132,8 @@ import {
 import { useGlobalMethods } from "@/composition/useGlobalMethods";
 import { useLoginMethods } from "@/composition/useLoginMethods";
 import { Ref, ref } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 export default {
   name: "Login",
   components: {
@@ -150,6 +152,8 @@ export default {
     IonButton,
   },
   setup() {
+    const store = useStore();
+    const router = useRouter();
     const mail: Ref<string> = ref("");
     const password: Ref<string> = ref("");
     const cPassword: Ref<string> = ref("");
@@ -161,7 +165,10 @@ export default {
       password,
       cPassword,
       toLogin,
-      ...useLoginMethods({ mail, password, cPassword, toLogin }, setToast),
+      ...useLoginMethods(
+        { mail, password, cPassword, toLogin, store, router },
+        setToast
+      ),
     };
   },
 };

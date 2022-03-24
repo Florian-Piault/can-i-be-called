@@ -1,9 +1,8 @@
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
-import { useStore } from "vuex";
-const store = useStore();
+import { computed } from "vue";
 
 export function useLoginMethods(
-  { password, cPassword, mail, toLogin },
+  { password, cPassword, mail, toLogin, store, router },
   setToast
 ) {
   // a changer
@@ -34,12 +33,14 @@ export function useLoginMethods(
   const authWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
+
     try {
       const result = await signInWithPopup(auth, provider);
       const credential = GoogleAuthProvider.credentialFromResult(result);
       const token = credential.accessToken;
       const user = result.user;
-      console.log(token, user);
+      store.commit("setAuthentication", true);
+      router.push({ name: "tabs" });
     } catch (e) {
       const errorCode = e.code;
       const errorMessage = e.message;
@@ -50,6 +51,8 @@ export function useLoginMethods(
       );
     }
   };
+
+  // const signOutWithGoogle
 
   return { swapMode, onSubmit, authWithGoogle };
 }

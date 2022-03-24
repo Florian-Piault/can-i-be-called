@@ -37,7 +37,7 @@ export default defineComponent({
 
     const store = useStore();
 
-    store.dispatch("getUsers", { db }).then(d => console.log(d));
+    // store.dispatch("getUsers", { db }).then(d => console.log(d));
 
     return { firebaseConfig, fbApp, db, store };
   },

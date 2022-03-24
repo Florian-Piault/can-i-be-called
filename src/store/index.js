@@ -2,9 +2,14 @@ import { createStore } from "vuex";
 import { collection, getDocs } from "firebase/firestore/lite";
 
 const store = createStore({
-  state: () => ({}),
-  mutations: () => ({}),
-  getters: {},
+  state: () => ({
+    isLogged: false,
+  }),
+  mutations: {
+    setAuthentication(state, log) {
+      state.isLogged = log;
+    },
+  },
   actions: {
     async getUsers({ commit }, { db }) {
       console.log(db);
