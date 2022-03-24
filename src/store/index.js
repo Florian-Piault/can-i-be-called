@@ -3,6 +3,7 @@ import { collection, getDocs } from "firebase/firestore/lite";
 
 const store = createStore({
   state: () => ({
+    database: null,
     isLogged: false,
   }),
   mutations: {

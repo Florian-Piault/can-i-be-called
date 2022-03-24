@@ -5,6 +5,10 @@ import store from "./store";
 
 import { IonicVue } from "@ionic/vue";
 
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore/lite";
+
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/vue/css/core.css";
 
@@ -29,3 +33,18 @@ const app = createApp(App).use(IonicVue).use(router).use(store);
 router.isReady().then(() => {
   app.mount("#app");
 });
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD5_UgA0JEDayMCgCCbMfOM3ngHUkDAL1c",
+  authDomain: "can-i-be-called.firebaseapp.com",
+  databaseURL:
+    "https://can-i-be-called-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "can-i-be-called",
+  storageBucket: "can-i-be-called.appspot.com",
+  messagingSenderId: "784590767148",
+  appId: "1:784590767148:web:063021c9ee27736a077d89",
+  measurementId: "G-X1Y1F6RX0H",
+};
+
+const fbApp = initializeApp(firebaseConfig);
+store.state.database = getFirestore(fbApp);
