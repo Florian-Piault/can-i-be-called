@@ -8,6 +8,11 @@ import { IonicVue } from "@ionic/vue";
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore/lite";
+import {
+  setPersistence,
+  browserLocalPersistence,
+  getAuth,
+} from "firebase/auth";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/vue/css/core.css";
@@ -48,3 +53,5 @@ const firebaseConfig = {
 
 const fbApp = initializeApp(firebaseConfig);
 store.state.database = getFirestore(fbApp);
+const auth = getAuth();
+setPersistence(auth, browserLocalPersistence);

@@ -1,5 +1,4 @@
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
-import { computed } from "vue";
 
 export function useLoginMethods(
   { password, cPassword, mail, toLogin, store, router },
@@ -33,7 +32,6 @@ export function useLoginMethods(
   const authWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
-
     try {
       const result = await signInWithPopup(auth, provider);
       const credential = GoogleAuthProvider.credentialFromResult(result);

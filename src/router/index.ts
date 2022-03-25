@@ -3,11 +3,14 @@ import { RouteRecordRaw } from "vue-router";
 import Tabs from "../views/Tabs.vue";
 import {
   getAuth,
+  onAuthStateChanged,
   setPersistence,
   signInWithRedirect,
   inMemoryPersistence,
   GoogleAuthProvider,
 } from "firebase/auth";
+import store from "@/store/index.js";
+import { computed } from "vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -54,10 +57,15 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth && !getAuth().currentUser)
-    return router.push({ name: "login" });
-  next();
+router.beforeEach((to, from) => {
+  const auth = getAuth();
+  onAuthStateChanged(auth, user => {
+    if (auth.currentUser) store.commit("setAuthentication", true);
+    const isLogged = computed(() => store.state.isLogged);
+    if (to.meta.requiresAuth && !isLogged.value) {
+      return router.push({ name: "login" });
+    }
+  });
 });
 
 export default router;
