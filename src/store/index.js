@@ -5,6 +5,7 @@ const store = createStore({
   state: () => ({
     database: null,
     isLogged: false,
+    user: null,
   }),
   mutations: {
     setAuthentication(state, log) {

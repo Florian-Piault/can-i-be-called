@@ -14,7 +14,7 @@
           action="post"
           v-show="toLogin"
         >
-          <ion-card-title class="card-title">Login</ion-card-title>
+          <ion-card-title class="card-title">Connexion</ion-card-title>
           <ion-card-content>
             <ion-item class="field">
               <ion-label position="floating" color="primary">E-mail</ion-label>
@@ -28,7 +28,7 @@
             </ion-item>
             <ion-item class="field">
               <ion-label position="floating" color="primary"
-                >Password</ion-label
+                >Mot de passe</ion-label
               >
               <ion-input
                 clear-input="true"
@@ -39,7 +39,7 @@
             </ion-item>
           </ion-card-content>
           <ion-item>
-            <ion-button type="submit" fill="solid">Login</ion-button>
+            <ion-button type="submit" fill="solid">Se connecter</ion-button>
           </ion-item>
           <ion-item>
             <div class="google-btn" @click="authWithGoogle">
@@ -49,13 +49,13 @@
                   src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
                 />
               </div>
-              <p class="btn-text"><b>Sign in with google</b></p>
+              <p class="btn-text"><b>Se connecter Google</b></p>
             </div>
           </ion-item>
           <ion-card-subtitle class="card-subtitle">
-            You don't have an account yet ?
+            Vous n'avez pas encore de compte ?
             <ion-button @click="swapMode" fill="clear"
-              >register here</ion-button
+              >s'inscrire ici</ion-button
             >
           </ion-card-subtitle>
         </form>
@@ -65,7 +65,7 @@
           action="post"
           v-show="!toLogin"
         >
-          <ion-card-title class="card-title">Register</ion-card-title>
+          <ion-card-title class="card-title">S'enregistrer</ion-card-title>
           <ion-card-content>
             <ion-item class="field">
               <ion-label position="floating" color="primary">E-mail</ion-label>
@@ -79,7 +79,7 @@
             </ion-item>
             <ion-item class="field">
               <ion-label position="floating" color="primary"
-                >Password</ion-label
+                >Mot de passe</ion-label
               >
               <ion-input
                 clear-input="true"
@@ -90,7 +90,7 @@
             </ion-item>
             <ion-item class="field">
               <ion-label position="floating" color="primary"
-                >Confirm password</ion-label
+                >Confirmer le mot de passe</ion-label
               >
               <ion-input
                 clear-input="true"
@@ -101,11 +101,13 @@
             </ion-item>
           </ion-card-content>
           <ion-item>
-            <ion-button type="submit" fill="solid">Register</ion-button>
+            <ion-button type="submit" fill="solid">S'inscrire</ion-button>
           </ion-item>
           <ion-card-subtitle class="card-subtitle">
-            You already have an account ?
-            <ion-button @click="swapMode" fill="clear">login here</ion-button>
+            Vous avez déjà un compte ?
+            <ion-button @click="swapMode" fill="clear"
+              >se connecter ici</ion-button
+            >
           </ion-card-subtitle>
         </form>
       </ion-card>

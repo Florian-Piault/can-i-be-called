@@ -3,7 +3,7 @@
     <!-- HEADER -->
     <ion-header>
       <ion-toolbar>
-        <ion-title>Screen_2</ion-title>
+        <ion-title>Agendas</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -54,6 +54,7 @@ import {
 } from "@ionic/vue";
 import { IonSlides, IonSlide } from "@ionic/vue";
 import Schedule from "../components/Schedule.vue";
+import { defineAsyncComponent } from "vue";
 
 interface Shop {
   id: number;
@@ -131,7 +132,9 @@ export default {
     async handleModal(shop: Shop) {
       this.currentShop = shop;
       const modal = await modalController.create({
-        component: Schedule,
+        component: defineAsyncComponent(
+          () => import("../components/Schedule.vue")
+        ),
         cssClass: "my-custom-class",
         swipeToClose: false,
         backdropDismiss: false,

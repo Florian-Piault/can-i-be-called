@@ -35,8 +35,7 @@ export function useLoginMethods(
     try {
       const result = await signInWithPopup(auth, provider);
       const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
-      const user = result.user;
+      store.state.user = result.user;
       store.commit("setAuthentication", true);
       router.push({ name: "tabs" });
     } catch (e) {
