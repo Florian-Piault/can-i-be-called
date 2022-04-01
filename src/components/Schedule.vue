@@ -11,11 +11,10 @@
         <IonItem>
           <IonSelect
             interface="popover"
-            v-model="mode"
-            :placeholder="mode.name"
+            v-model="mode.id"
             @ionChange="modeChanged"
           >
-            <IonSelectOption v-for="m in modes" :key="m.id" :value="m">{{
+            <IonSelectOption v-for="m in modes" :key="m.id" :value="m.id">{{
               m.name
             }}</IonSelectOption>
           </IonSelect>
@@ -153,7 +152,6 @@ export default defineComponent({
 
     const close = () => {
       if (!tmpStart.value || !tmpEnd.value) return modalController.dismiss();
-      // todo fdfdfdfdf
       else modalController.dismiss(tmpSchedule.value);
     };
 
