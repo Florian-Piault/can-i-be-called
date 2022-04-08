@@ -53,7 +53,6 @@ import {
   modalController,
 } from "@ionic/vue";
 import { IonSlides, IonSlide } from "@ionic/vue";
-import Schedule from "../components/Schedule.vue";
 import { defineAsyncComponent } from "vue";
 
 interface Shop {
@@ -61,7 +60,7 @@ interface Shop {
   name: string;
   path: string;
   description: string;
-  schedule: string[];
+  schedule: any[];
 }
 
 export default {
@@ -148,7 +147,8 @@ export default {
       await modal.present();
 
       const { data } = await modal.onDidDismiss();
-      if (data) this.currentShop.schedule.push(data.schedule).flat();
+      // push in database
+      if (data) this.currentShop.schedule.push(...data);
       this.currentShop = null;
     },
   },

@@ -23,14 +23,15 @@
         <template v-if="mode.id === 'ONE_DAY'">
           <template v-if="step === 0">
             <DatePicker
+              disabled
               mode="date"
               v-model="date"
               :model-config="modelConfig"
             />
-            <ion-button @click="addDate" expand="block">
+            <!-- <ion-button @click="addDate" expand="block">
               <ion-icon :icon="addCircleOutline" />
               <ion-label>Choisir le jour</ion-label>
-            </ion-button>
+            </ion-button> -->
           </template>
           <template v-if="step === 1">
             <DatePicker
@@ -39,10 +40,10 @@
               :model-config="modelConfig"
               is24hr
             />
-            <ion-button @click="addDate" expand="block">
+            <!-- <ion-button @click="addDate" expand="block">
               <ion-icon :icon="addCircleOutline" />
               <ion-label>Choisir l'heure de début</ion-label>
-            </ion-button>
+            </ion-button> -->
           </template>
           <template v-if="step === 2">
             <DatePicker
@@ -51,11 +52,25 @@
               :model-config="modelConfig"
               is24hr
             />
-            <ion-button @click="addDate" expand="block">
+            <!-- <ion-button @click="addDate" expand="block">
               <ion-icon :icon="addCircleOutline" />
               <ion-label>Choisir l'heure de fin</ion-label>
-            </ion-button>
+            </ion-button> -->
           </template>
+          <div class="btn-side-by-side">
+            <ion-button
+              @click="addDate(event, true)"
+              expand="block"
+              :disabled="step === 0"
+            >
+              <ion-icon :icon="arrowBackCircleOutline" />
+              <ion-label>Retour</ion-label>
+            </ion-button>
+            <ion-button @click="addDate" expand="block">
+              <ion-label>Suivant</ion-label>
+              <ion-icon :icon="arrowForwardCircleOutline" />
+            </ion-button>
+          </div>
         </template>
         <!-- MODE RANGE : 2 DATES -->
         <template v-else-if="mode.id === 'RANGE'">
@@ -72,46 +87,83 @@
         </template>
 
         <!-- RESULTS DISPLAY -->
-        <div v-if="mode.id === 'ONE_DAY' && displayedDate">
-          <div :class="step === 0 ? 'selected' : ''">
-            {{ displayedDate.toLocaleString() }}
+        <IonItem>
+          <div v-if="mode.id === 'ONE_DAY' && displayedDate">
+            <div :class="step === 0 ? 'selected' : ''">
+              {{ displayedDate.toLocaleString() }}
+            </div>
+            <div>
+              <span :class="step === 1 ? 'selected' : ''">
+                {{ displayedHours.start.toLocaleString() }} &rarr;
+              </span>
+              <span :class="step === 2 ? 'selected' : ''">
+                {{ displayedHours.end.toLocaleString() }}
+              </span>
+            </div>
           </div>
-          <div>
-            <span :class="step === 1 ? 'selected' : ''">
-              {{ displayedHours.start.toLocaleString() }} &rarr;
-            </span>
-            <span :class="step === 2 ? 'selected' : ''">
-              {{ displayedHours.end.toLocaleString() }}
-            </span>
+          <div v-else-if="mode.id === 'RANGE' && displayedInterval">
+            <span>
+              <time>{{
+                displayedInterval.start
+                  ? displayedInterval.start.toLocaleString()
+                  : "..."
+              }}</time></span
+            ><br />
+            <span>
+              <time>{{
+                displayedInterval.end
+                  ? displayedInterval.end.toLocaleString()
+                  : "..."
+              }}</time></span
+            >
           </div>
-        </div>
-        <div v-else-if="mode.id === 'RANGE' && displayedInterval">
-          <span>
-            <time>{{
-              displayedInterval.start
-                ? displayedInterval.start.toLocaleString()
-                : "..."
-            }}</time></span
-          ><br />
-          <span>
-            <time>{{
-              displayedInterval.end
-                ? displayedInterval.end.toLocaleString()
-                : "..."
-            }}</time></span
-          >
-        </div>
+        </IonItem>
       </div>
     </div>
   </ion-content>
-  <ion-button @click="close">
-    <ion-icon :icon="closeCircleOutline" />
-    <ion-label>Fermer</ion-label>
-  </ion-button>
+
+  <!-- steps actions -->
+  <ion-buttons class="btn-side-by-side">
+    <ion-button @click="close('cancel')" color="danger">
+      <ion-icon :icon="closeCircleOutline" />
+      <ion-label>Annuler</ion-label>
+    </ion-button>
+    <ion-button @click="close('save')" color="success">
+      <ion-icon :icon="checkmarkCircleOutline" />
+      <ion-label>Valider</ion-label>
+    </ion-button>
+  </ion-buttons>
 </template>
 
 <script lang="ts">
-import { closeCircleOutline, addCircleOutline } from "ionicons/icons";
+// todo -> feedback schedule added (toast?)
+// todo -> calendar : see directly schedules
+// todo -> db get/post
+// todo -> profile page
+
+// todo -> login : get/post
+// todo -> login : mail+password
+// todo -> login : other providers
+interface Schedule {
+  mode: string;
+  date?: Date;
+  interval?: object;
+  hours?: Date[];
+  repeat: string;
+}
+
+interface Mode {
+  id: string;
+  name: string;
+}
+
+import {
+  closeCircleOutline,
+  addCircleOutline,
+  checkmarkCircleOutline,
+  arrowForwardCircleOutline,
+  arrowBackCircleOutline,
+} from "ionicons/icons";
 import { Temporal } from "@js-temporal/polyfill";
 import { DatePicker } from "v-calendar";
 import {
@@ -120,6 +172,7 @@ import {
   IonTitle,
   IonToolbar,
   IonItem,
+  IonButtons,
   IonButton,
   IonIcon,
   IonLabel,
@@ -138,6 +191,7 @@ export default defineComponent({
     IonHeader,
     IonTitle,
     IonToolbar,
+    IonButtons,
     IonButton,
     IonIcon,
     IonLabel,
@@ -148,11 +202,12 @@ export default defineComponent({
   },
   setup(props) {
     // --- props
-    const { schedule: tmpSchedule } = toRefs(props);
+    const { schedule: actualSchedule } = toRefs(props);
 
     // --- data
+    const tmpSchedule: Ref<Schedule[]> = ref([]);
     const step: Ref<number> = ref(0);
-    const modes: Ref<Array<{ id: string; name: string }>> = ref([
+    const modes: Ref<Mode[]> = ref([
       {
         id: "ONE_DAY",
         name: "Sur un jour",
@@ -162,7 +217,7 @@ export default defineComponent({
         name: "Sur un intervalle",
       },
     ]);
-    const mode: Ref<{ id: string; name: string }> = ref({
+    const mode: Ref<Mode> = ref({
       id: "ONE_DAY",
       name: "Sur un jour",
     });
@@ -181,15 +236,13 @@ export default defineComponent({
     const repeat = null;
     const date: Ref<Date> = ref(new Date());
     const hours: Ref<{ start: Date; end: Date }> = ref({
-      start: new Date(),
-      end: new Date(),
+      start: new Date(Date.now()),
+      end: new Date(Date.now()),
     });
     const interval: Ref<{ start: Date; end: Date }> = ref({
       start: null,
       end: null,
     });
-    const tmpStart = ref(null);
-    const tmpEnd = ref(null);
     const modelConfig = {
       type: "Date",
       mask: "iso",
@@ -198,18 +251,34 @@ export default defineComponent({
     // --- methods
     const { setToast } = useGlobalMethods();
 
-    const close = () => {
-      if (!tmpStart.value || !tmpEnd.value) return modalController.dismiss();
-      else modalController.dismiss(tmpSchedule.value);
+    const close = (mode: "save" | "cancel") => {
+      try {
+        if (mode === "save" && !tmpSchedule.value)
+          return setToast("Veuillez choisir un horaire");
+        if (mode === "cancel") modalController.dismiss();
+        else modalController.dismiss(tmpSchedule.value);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        //--- reset data
+        interval.value = { start: null, end: null };
+        step.value = 0;
+        date.value = new Date();
+        tmpSchedule.value = null;
+      }
     };
 
-    const addDate = () => {
+    const addDate = (event, prev: boolean) => {
       if (step.value === 0) {
         if (!date.value) return setToast("Sélectionnez une date.");
         return step.value++;
       }
-      if (step.value === 1) return step.value++;
+      if (step.value === 1) {
+        if (prev) return step.value--;
+        return step.value++;
+      }
       if (step.value === 2) {
+        if (prev) return step.value--;
         // if start is more recent than end => swap both
         let tmpHours = [hours.value.start, hours.value.end];
         if (hours.value.start >= hours.value.end)
@@ -219,34 +288,10 @@ export default defineComponent({
           mode: mode.value.id,
           date: date.value,
           hours: tmpHours,
+          repeat: null,
         });
         step.value = 0;
       }
-      // errors
-      // if (!date.value) return setToast("Sélectionnez une date.");
-      // if (tmpSchedule.value.includes(date.value))
-      //   return setToast("La date choisie est déjà prise.");
-
-      // // increment step and attribute values
-      // if (step.value === 0) tmpStart.value = date.value;
-      // else {
-      //   if (tmpStart.value >= date.value)
-      //     return setToast(
-      //       "La date choisie doit être plus récente que la prmière",
-      //       1500
-      //     );
-      //   tmpEnd.value = date.value;
-      // }
-      // step.value = (step.value + 1) % 2;
-      // if (tmpStart.value && tmpEnd.value) {
-      //   tmpSchedule.value.push({
-      //     mode: "ONE_DAY",
-      //     start: tmpStart.value,
-      //     end: tmpEnd.value,
-      //   });
-      //   tmpStart.value = null;
-      //   tmpEnd.value = null;
-      // }
     };
 
     const addInterval = () => {
@@ -271,24 +316,19 @@ export default defineComponent({
       if (!date.value) return;
       return Temporal.PlainDate.from({
         year: date.value.getFullYear(),
-        month: date.value.getUTCMonth(),
-        day: date.value.getUTCDate(),
+        month: date.value.getMonth(),
+        day: date.value.getDate(),
       });
     });
 
     const displayedHours = computed(() => {
-      //todo :
-      // BUG TIMEZONES
-      // PUSH WHEN CLOSING MODAL
-      // MODAL CLOSE || MODAL SAVE
-      // FACTORISER LES BOUTON EN : PREV / NEXT
       const HOUR_START: Temporal.PlainTime = Temporal.PlainTime.from({
-        hour: hours.value.start.getUTCHours(),
+        hour: hours.value.start.getHours(),
         minute: hours.value.start.getMinutes(),
       });
 
       const HOUR_END: Temporal.PlainTime = Temporal.PlainTime.from({
-        hour: hours.value.end.getUTCHours(),
+        hour: hours.value.end.getHours(),
         minute: hours.value.end.getMinutes(),
       });
 
@@ -330,8 +370,7 @@ export default defineComponent({
       date,
       hours,
       interval,
-      tmpStart,
-      tmpEnd,
+      actualSchedule,
       tmpSchedule,
       modelConfig,
       close,
@@ -343,6 +382,9 @@ export default defineComponent({
       displayedInterval,
       closeCircleOutline,
       addCircleOutline,
+      checkmarkCircleOutline,
+      arrowForwardCircleOutline,
+      arrowBackCircleOutline,
     };
   },
 });
@@ -365,5 +407,10 @@ export default defineComponent({
 .selected {
   font-weight: bold;
   font-size: 1.15em;
+}
+
+.btn-side-by-side {
+  display: flex;
+  justify-content: space-around;
 }
 </style>
