@@ -5,7 +5,7 @@ export function useLogoutMethods(store, router) {
     try {
       const auth = getAuth();
       await signOut(auth);
-      store.commit("setAuthentication", false);
+      store.commit("setAuthentication", null);
       router.push({ name: "login" });
     } catch (e) {
       console.error(e);

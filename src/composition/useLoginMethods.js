@@ -4,15 +4,6 @@ export function useLoginMethods(
   { password, cPassword, mail, toLogin, store, router },
   setToast
 ) {
-  // a changer
-  const checkLoginFields = () => {
-    return mail.value && password.value;
-  };
-  // a changer
-  const checkRegisterFields = () => {
-    return password.value === cPassword.value;
-  };
-
   const swapMode = () => {
     password.value = "";
     cPassword.value = "";
@@ -20,24 +11,24 @@ export function useLoginMethods(
     toLogin.value = !toLogin.value;
   };
 
-  const onSubmit = mode => {
-    if (mode === "register") {
-      if (!checkRegisterFields()) return setToast("register failed");
-      return setToast("register OK");
-    }
-    if (!checkLoginFields) return setToast("login failed");
-    return setToast("login OK");
-  };
-
   const authWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
     try {
-      const result = await signInWithPopup(auth, provider);
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      store.state.user = result.user;
-      store.commit("setAuthentication", true);
+      await signInWithPopup(auth, provider);
       router.push({ name: "tabs" });
+
+      // create user if it doesn't exist
+      const user = await store.dispatch("getUser", {
+        db: store.state.database,
+        id: auth.currentUser.uid,
+      });
+      if (!user) {
+        await store.dispatch("createUserWithGoogle", {
+          db: store.state.database,
+          user: auth.currentUser,
+        });
+      }
     } catch (e) {
       const errorCode = e.code;
       const errorMessage = e.message;
@@ -49,5 +40,5 @@ export function useLoginMethods(
     }
   };
 
-  return { swapMode, onSubmit, authWithGoogle };
+  return { swapMode, authWithGoogle };
 }

@@ -1,10 +1,11 @@
 import { toastController } from "@ionic/vue";
 
 export function useGlobalMethods() {
-  const setToast = async (msg, duration = 2000) => {
+  const setToast = async ({ msg, duration = 2000, color = "info" }) => {
     const toast = await toastController.create({
       message: msg,
-      duration: duration,
+      duration,
+      color,
     });
     return toast.present();
   };

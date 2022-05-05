@@ -59,7 +59,7 @@
           </template>
           <div class="btn-side-by-side">
             <ion-button
-              @click="addDate(event, true)"
+              @click="addDate($event, true)"
               expand="block"
               :disabled="step === 0"
             >
@@ -87,37 +87,23 @@
         </template>
 
         <!-- RESULTS DISPLAY -->
-        <IonItem>
-          <div v-if="mode.id === 'ONE_DAY' && displayedDate">
-            <div :class="step === 0 ? 'selected' : ''">
-              {{ displayedDate.toLocaleString() }}
-            </div>
-            <div>
-              <span :class="step === 1 ? 'selected' : ''">
-                {{ displayedHours.start.toLocaleString() }} &rarr;
-              </span>
-              <span :class="step === 2 ? 'selected' : ''">
-                {{ displayedHours.end.toLocaleString() }}
-              </span>
-            </div>
-          </div>
-          <div v-else-if="mode.id === 'RANGE' && displayedInterval">
-            <span>
-              <time>{{
-                displayedInterval.start
-                  ? displayedInterval.start.toLocaleString()
-                  : "..."
-              }}</time></span
-            ><br />
-            <span>
-              <time>{{
-                displayedInterval.end
-                  ? displayedInterval.end.toLocaleString()
-                  : "..."
-              }}</time></span
-            >
-          </div>
-        </IonItem>
+        <!-- <ScheduleDisplaySteps :data="displayedData" :step="step" /> -->
+        <ScheduleDisplaySteps
+          :modeId="mode.id"
+          :dDate="displayedDate"
+          :dHours="displayedHours"
+          :dInterval="displayedInterval"
+          :stepNum="step"
+        />
+      </div>
+
+      <div class="schedule-display">
+        <ScheduleDisplay
+          v-for="(s, idx) in allSchedules"
+          :key="'schedule-' + idx"
+          :data="s"
+          :step="null"
+        />
       </div>
     </div>
   </ion-content>
@@ -182,10 +168,12 @@ import {
 } from "@ionic/vue";
 import { computed, ref, toRefs } from "@vue/reactivity";
 import { useGlobalMethods } from "@/composition/useGlobalMethods";
-import { defineComponent, Ref } from "vue";
+import { defineComponent, Ref, watch } from "vue";
+import ScheduleDisplaySteps from "./ScheduleDisplaySteps.vue";
+import ScheduleDisplay from "./ScheduleDisplay.vue";
 export default defineComponent({
   name: "Schedule",
-  props: ["id", "title", "content", "schedule"],
+  props: ["schedule", "title"],
   components: {
     IonContent,
     IonHeader,
@@ -199,13 +187,19 @@ export default defineComponent({
     IonSelect,
     IonSelectOption,
     DatePicker,
+    ScheduleDisplaySteps,
+    ScheduleDisplay,
   },
   setup(props) {
     // --- props
-    const { schedule: actualSchedule } = toRefs(props);
+    const { schedule: actualSchedule } = toRefs(props) as {
+      schedule: Ref<Schedule[]>;
+    };
 
     // --- data
     const tmpSchedule: Ref<Schedule[]> = ref([]);
+    const allSchedules: Ref<Schedule[]> = ref([]);
+    allSchedules.value.push(...actualSchedule.value);
     const step: Ref<number> = ref(0);
     const modes: Ref<Mode[]> = ref([
       {
@@ -247,14 +241,15 @@ export default defineComponent({
       type: "Date",
       mask: "iso",
     };
+    const changes: Ref<number> = ref(0);
 
     // --- methods
     const { setToast } = useGlobalMethods();
 
     const close = (mode: "save" | "cancel") => {
       try {
-        if (mode === "save" && !tmpSchedule.value)
-          return setToast("Veuillez choisir un horaire");
+        if (mode === "save" && changes.value < 1)
+          return setToast({ msg: "Veuillez choisir un horaire" });
         if (mode === "cancel") modalController.dismiss();
         else modalController.dismiss(tmpSchedule.value);
       } catch (e) {
@@ -264,13 +259,13 @@ export default defineComponent({
         interval.value = { start: null, end: null };
         step.value = 0;
         date.value = new Date();
-        tmpSchedule.value = null;
+        tmpSchedule.value = [];
       }
     };
 
-    const addDate = (event, prev: boolean) => {
+    const addDate = (event: Event, prev: boolean) => {
       if (step.value === 0) {
-        if (!date.value) return setToast("Sélectionnez une date.");
+        if (!date.value) return setToast({ msg: "Sélectionnez une date." });
         return step.value++;
       }
       if (step.value === 1) {
@@ -284,26 +279,31 @@ export default defineComponent({
         if (hours.value.start >= hours.value.end)
           tmpHours = [hours.value.end, hours.value.start];
 
-        tmpSchedule.value.push({
+        const _schedule = {
           mode: mode.value.id,
           date: date.value,
           hours: tmpHours,
           repeat: null,
-        });
+        };
+        tmpSchedule.value.push(_schedule);
+        allSchedules.value.push(_schedule);
         step.value = 0;
+        changes.value++;
       }
     };
 
     const addInterval = () => {
       // errors
       if (!interval.value.start || !interval.value.end)
-        return setToast("Sélectionnez un intervalle.");
-
-      tmpSchedule.value.push({
+        return setToast({ msg: "Sélectionnez un intervalle." });
+      const _interval = {
         mode: "INTERVAL",
         interval: interval.value,
         repeat: null,
-      });
+      };
+      tmpSchedule.value.push(_interval);
+      allSchedules.value.push(_interval);
+      changes.value++;
     };
 
     const modeChanged = () => {
@@ -339,7 +339,8 @@ export default defineComponent({
     });
 
     const displayedInterval = computed(() => {
-      if (!interval.value.start && !interval.value.end) return;
+      if (!interval.value.start && !interval.value.end)
+        return { start: null, end: null };
       const intervalStart = Temporal.PlainDate.from({
         year: interval.value.start.getFullYear(),
         month: interval.value.start.getUTCMonth(),
@@ -361,6 +362,15 @@ export default defineComponent({
       };
     });
 
+    const displayedData = computed(() => {
+      return {
+        mode: mode,
+        displayedDate: displayedDate,
+        displayedHours: displayedHours,
+        displayedInterval: displayedInterval,
+      };
+    });
+
     return {
       step,
       mode,
@@ -372,6 +382,7 @@ export default defineComponent({
       interval,
       actualSchedule,
       tmpSchedule,
+      allSchedules,
       modelConfig,
       close,
       addDate,
@@ -380,6 +391,7 @@ export default defineComponent({
       displayedHours,
       displayedDate,
       displayedInterval,
+      displayedData,
       closeCircleOutline,
       addCircleOutline,
       checkmarkCircleOutline,
@@ -404,13 +416,14 @@ export default defineComponent({
   align-items: center;
 }
 
-.selected {
-  font-weight: bold;
-  font-size: 1.15em;
-}
-
 .btn-side-by-side {
   display: flex;
   justify-content: space-around;
+}
+
+.schedule-display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 </style>

@@ -9,11 +9,7 @@
     <ion-content>
       <ion-card class="wrapper">
         <!-- login -->
-        <form
-          @submit.prevent="onSubmit('login')"
-          action="post"
-          v-show="toLogin"
-        >
+        <form action="post" v-show="toLogin">
           <ion-card-title class="card-title">Connexion</ion-card-title>
           <ion-card-content>
             <ion-item class="field">
@@ -60,11 +56,7 @@
           </ion-card-subtitle>
         </form>
         <!-- register -->
-        <form
-          @submit.prevent="onSubmit('register')"
-          action="post"
-          v-show="!toLogin"
-        >
+        <form action="post" v-show="!toLogin">
           <ion-card-title class="card-title">S'enregistrer</ion-card-title>
           <ion-card-content>
             <ion-item class="field">

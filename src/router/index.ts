@@ -30,18 +30,18 @@ const routes: Array<RouteRecordRaw> = [
       {
         name: "tabs",
         path: "",
-        redirect: "/tabs/tab2",
+        redirect: "/tabs/agenda",
       },
       {
-        path: "tab1",
-        component: () => import("@/views/Inventory.vue"),
+        path: "profil",
+        component: () => import("@/views/Profile.vue"),
       },
       {
-        path: "tab2",
-        component: () => import("@/views/Screen_2.vue"),
+        path: "agenda",
+        component: () => import("@/views/Agenda.vue"),
       },
       {
-        path: "tab3",
+        path: "params",
         component: () => import("@/views/Parameters.vue"),
       },
     ],
@@ -60,12 +60,14 @@ const router = createRouter({
 router.beforeEach((to, from) => {
   const auth = getAuth();
   onAuthStateChanged(auth, user => {
-    if (auth.currentUser) store.commit("setAuthentication", true);
-    const isLogged = computed(() => store.state.isLogged);
+    if (auth.currentUser) {
+      store.commit("setAuthentication", user);
+    }
+
+    const isLogged = computed(() => store.getters.isLogged);
     if (to.meta.requiresAuth && !isLogged.value) {
       return router.push({ name: "login" });
     }
   });
 });
-
 export default router;
