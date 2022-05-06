@@ -33,7 +33,7 @@
               >
               <ion-input
                 clear-input="true"
-                type="password"
+                :type="passwordType"
                 v-model="password"
                 required
               ></ion-input>

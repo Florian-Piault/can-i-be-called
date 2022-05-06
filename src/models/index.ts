@@ -1,5 +1,14 @@
 import { Ref } from "vue";
 
+/**
+ * Schedule attached to a user
+ *
+ * if mode is **ONE_DAY** : date & hours
+ *
+ * if mode is **RANGE** : interval
+ *
+ * @beta repeat is not used yet
+ */
 export interface Schedule {
   mode: string;
   date?: Date;
@@ -8,6 +17,9 @@ export interface Schedule {
   repeat: string;
 }
 
+/**
+ * A user that can have schedules
+ */
 export interface Shop {
   displayName: Ref<string>;
   schedules: Ref<Schedule[]>;
