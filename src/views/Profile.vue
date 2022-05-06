@@ -92,6 +92,7 @@ export default {
 
     onUnmounted(() => {
       user.value = null;
+      isAnonymous.value = false;
       profilePics.value = [];
     });
 
