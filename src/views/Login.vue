@@ -38,7 +38,7 @@
             <ion-button type="submit" fill="solid">Se connecter</ion-button>
           </ion-item>
           <ion-item>
-            <div class="google-btn" @click="authWithGoogle">
+            <!-- <div class="google-btn" @click="authWithGoogle">
               <div class="google-icon-wrapper">
                 <img
                   class="google-icon"
@@ -46,12 +46,15 @@
                 />
               </div>
               <p class="btn-text"><b>Se connecter Google</b></p>
-            </div>
+            </div> -->
+            <ion-button @click="authWithGoogle" fill="solid" color="medium"
+              >Se connecter avec Google</ion-button
+            >
           </ion-item>
           <ion-item>
-            <div class="anonymous-btn" @click="authAnonymous">
-              Accéder sans se connecter
-            </div>
+            <ion-button @click="authAnonymous" fill="solid" color="medium"
+              >Se connecter en invité</ion-button
+            >
           </ion-item>
           <ion-card-subtitle class="card-subtitle">
             Vous n'avez pas encore de compte ?
