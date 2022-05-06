@@ -37,6 +37,13 @@
                 v-model="password"
                 required
               ></ion-input>
+              <ion-icon
+                v-if="password"
+                @click="togglePassword"
+                slot="end"
+                class="passwordIcon"
+                :icon="passwordIcon"
+              ></ion-icon>
             </ion-item>
           </ion-card-content>
           <ion-item>
@@ -58,7 +65,7 @@
         >
           <ion-card-title class="card-title">S'enregistrer</ion-card-title>
           <ion-card-content>
-            <ion-item class="field">
+            <ion-item>
               <ion-label position="floating" color="primary">E-mail</ion-label>
               <ion-input
                 clear-input="true"
@@ -68,16 +75,23 @@
                 required
               ></ion-input>
             </ion-item>
-            <ion-item class="field">
+            <ion-item>
               <ion-label position="floating" color="primary"
                 >Mot de passe</ion-label
               >
               <ion-input
                 clear-input="true"
-                type="password"
+                :type="passwordType"
                 v-model="password"
                 required
               ></ion-input>
+              <ion-icon
+                v-if="password"
+                @click="togglePassword"
+                slot="end"
+                class="passwordIcon"
+                :icon="passwordIcon"
+              ></ion-icon>
             </ion-item>
           </ion-card-content>
           <ion-item>
@@ -90,20 +104,16 @@
             >
           </ion-card-subtitle>
         </form>
-        <template v-if="plateforms.includes('desktop')">
-          <ion-buttons>
+        <ion-buttons>
+          <template v-if="plateforms.includes('desktop')">
             <ion-button @click="authWithGoogle" fill="solid" color="medium"
               >Se connecter avec Google</ion-button
             >
-            <ion-button @click="authAnonymous" fill="solid" color="medium"
-              >Se connecter en invité</ion-button
-            >
-
-            <!-- <ion-button @click="authMobile" fill="solid" color="medium"
-              >IOS</ion-button
-            > -->
-          </ion-buttons>
-        </template>
+          </template>
+          <ion-button @click="authAnonymous" fill="solid" color="medium"
+            >Se connecter en invité</ion-button
+          >
+        </ion-buttons>
       </ion-card>
     </ion-content>
   </ion-page>
@@ -125,6 +135,7 @@ import {
   IonLabel,
   IonButton,
   IonButtons,
+  IonIcon,
 } from "@ionic/vue";
 import { useGlobalMethods } from "@/composition/useGlobalMethods";
 import { useLoginMethods } from "@/composition/useLoginMethods";
@@ -132,6 +143,8 @@ import { Ref, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { getPlatforms } from "@ionic/vue";
+import { eyeOutline as eye, eyeOffOutline as eyeOff } from "ionicons/icons";
+
 export default {
   name: "Login",
   components: {
@@ -149,20 +162,41 @@ export default {
     IonLabel,
     IonButton,
     IonButtons,
+    IonIcon,
   },
   setup() {
     const store = useStore();
     const router = useRouter();
     const mail: Ref<string> = ref("");
     const password: Ref<string> = ref("");
+    const passwordType: Ref<string> = ref("password");
+    const passwordIcon: Ref<string> = ref(eyeOff);
     const toLogin: Ref<boolean> = ref(true);
     const { setToast } = useGlobalMethods();
     const plateforms = getPlatforms();
+
+    /**
+     * Show or hide the password
+     *
+     * Changes the **input:password** to an **input:text**
+     *
+     * Changes the icon aswell
+     */
+    const togglePassword = () => {
+      passwordType.value = passwordType.value === "text" ? "password" : "text";
+      passwordIcon.value = passwordIcon.value === eyeOff ? eye : eyeOff;
+    };
+
     return {
       mail,
       password,
+      passwordType,
+      passwordIcon,
       toLogin,
       plateforms,
+      eye,
+      eyeOff,
+      togglePassword,
       ...useLoginMethods({ mail, password, toLogin, store, router }, setToast),
     };
   },
@@ -202,89 +236,11 @@ export default {
   align-items: center;
 }
 
-.anonymous-btn {
-  background: var(--ion-color-medium);
-  color: var(--ion-color-light);
-  padding: 0.5em 1em;
-  border-radius: 5px;
-  font-size: 0.8rem;
+.passwordIcon {
   cursor: pointer;
-}
-
-@media screen and (min-width: 700px) {
-  .google-btn {
-    cursor: pointer;
-    width: 184px;
-    height: 42px;
-    background-color: #4285f4;
-    border-radius: 2px;
-    box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.25);
-  }
-
-  .google-btn:hover {
-    box-shadow: 0 0 6px #4285f4;
-  }
-  .google-btn:active {
-    background: #1669f2;
-  }
-  .google-icon-wrapper {
-    position: absolute;
-    margin-top: 1px;
-    margin-left: 1px;
-    width: 40px;
-    height: 40px;
-    border-radius: 2px;
-    background-color: #fff;
-  }
-  .google-icon {
-    position: absolute;
-    margin-top: 11px;
-    margin-left: 11px;
-    width: 18px;
-    height: 18px;
-  }
-  .btn-text {
-    float: right;
-    margin: 11px 11px 0 0;
-    color: #fff;
-    font-size: 14px;
-    letter-spacing: 0.2px;
-  }
-}
-@media screen and (max-width: 699px) {
-  .google-btn {
-    cursor: pointer;
-    width: 42px;
-    height: 42px;
-    background-color: #4285f4;
-    border-radius: 1000px;
-    box-shadow: 4px 2px 5px 0 rgba(0, 0, 0, 0.25);
-  }
-
-  .google-btn:hover {
-    box-shadow: 4px 2px 5px 0px #4285f4;
-  }
-  .google-btn:active {
-    background: #1669f2;
-  }
-  .google-icon-wrapper {
-    position: absolute;
-    margin-top: 1px;
-    margin-left: 1px;
-    width: 40px;
-    height: 40px;
-    border-radius: 1000px;
-    background-color: #fff;
-  }
-  .google-icon {
-    position: absolute;
-    margin-top: 11px;
-    margin-left: 11px;
-    width: 18px;
-    height: 18px;
-  }
-  .btn-text {
-    display: none;
-  }
+  font-size: 1.5rem !important;
+  position: relative !important;
+  top: 2rem !important;
+  margin: 0 auto !important;
 }
 </style>

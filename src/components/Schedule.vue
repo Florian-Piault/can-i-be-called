@@ -119,19 +119,6 @@
 // todo -> profile page
 // todo -> login : mail+password
 
-interface Schedule {
-  mode: string;
-  date?: Date;
-  interval?: { start: Date; end: Date };
-  hours?: Date[];
-  repeat: string;
-}
-
-interface Mode {
-  id: string;
-  name: string;
-}
-
 import {
   closeCircleOutline,
   addCircleOutline,
@@ -160,6 +147,7 @@ import { useGlobalMethods } from "@/composition/useGlobalMethods";
 import { defineComponent, Ref } from "vue";
 import ScheduleDisplaySteps from "./ScheduleDisplaySteps.vue";
 import ScheduleDisplay from "./ScheduleDisplay.vue";
+import { Schedule, Mode } from "@/models/index";
 export default defineComponent({
   name: "Schedule",
   props: ["schedule", "title", "currentUserId", "shopId"],

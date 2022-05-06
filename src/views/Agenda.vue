@@ -57,22 +57,7 @@ import {
   ref,
 } from "vue";
 import store from "@/store";
-import { newspaper } from "ionicons/icons";
-
-interface Schedule {
-  mode: string;
-  date?: Date;
-  interval?: object;
-  hours?: Date[];
-  repeat: string;
-}
-
-interface Shop {
-  displayName: Ref<string>;
-  schedules: Ref<Schedule[]>;
-  uid: Ref<string>;
-  img: string;
-}
+import { Schedule, Shop } from "@/models/index";
 
 export default defineComponent({
   name: "Agenda",

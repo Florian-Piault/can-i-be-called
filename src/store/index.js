@@ -13,7 +13,6 @@ import {
   arrayUnion,
 } from "firebase/firestore/lite";
 import { getStorage, listAll, ref, getDownloadURL } from "firebase/storage";
-import { getAuth } from "firebase/auth";
 
 const store = createStore({
   state: () => ({
@@ -21,11 +20,19 @@ const store = createStore({
     user: null,
   }),
   mutations: {
+    /**
+     *
+     * @param {*} state the instance of the state
+     * @param {*} log the instance if the user
+     */
     setAuthentication(state, log) {
       state.user = log;
     },
   },
   getters: {
+    /**
+     * @return true if the user is logged
+     */
     isLogged(state) {
       return !!state.user;
     },

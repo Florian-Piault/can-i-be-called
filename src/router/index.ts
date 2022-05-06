@@ -1,14 +1,7 @@
 import { createRouter, createWebHistory } from "@ionic/vue-router";
 import { RouteRecordRaw } from "vue-router";
 import Tabs from "../views/Tabs.vue";
-import {
-  getAuth,
-  onAuthStateChanged,
-  setPersistence,
-  signInWithRedirect,
-  inMemoryPersistence,
-  GoogleAuthProvider,
-} from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import store from "@/store/index.js";
 import { computed } from "vue";
 
@@ -28,19 +21,17 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
     children: [
       {
-        name: "tabs",
-        path: "",
-        redirect: "/tabs/agenda",
-      },
-      {
+        name: "profil",
         path: "profil",
         component: () => import("@/views/Profile.vue"),
       },
       {
+        name: "agenda",
         path: "agenda",
         component: () => import("@/views/Agenda.vue"),
       },
       {
+        name: "params",
         path: "params",
         component: () => import("@/views/Parameters.vue"),
       },

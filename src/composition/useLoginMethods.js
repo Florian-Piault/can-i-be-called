@@ -3,7 +3,6 @@ import {
   getAuth,
   signInWithPopup,
   signInAnonymously,
-  signInWithCredential,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
@@ -12,12 +11,20 @@ export function useLoginMethods(
   { password, mail, toLogin, store, router },
   setToast
 ) {
+  /**
+   * Changes the mode : login < > register
+   */
   const swapMode = () => {
     password.value = "";
     mail.value = "";
     toLogin.value = !toLogin.value;
   };
 
+  /**
+   * Creates an account thanks to an email and a password
+   *
+   * Creates a instance of the new user in the database
+   */
   const register = async () => {
     const auth = getAuth();
     try {
@@ -30,56 +37,53 @@ export function useLoginMethods(
         db: store.state.database,
         user: credentials.user,
       });
-      router.push({ name: "tabs" });
-    } catch (e) {
-      setToast({
-        message: e.message,
-        color: "error",
-      });
+      router.push({ name: "agenda" });
+    } catch (error) {
+      setToast({ message: "Erreur lors de l'inscription", color: "danger" });
+      console.error(error);
     }
   };
 
+  /**
+   * Logs the user into the app thanks to an email and a password
+   */
   const authPassword = async () => {
     const auth = getAuth();
     try {
       await signInWithEmailAndPassword(auth, mail.value, password.value);
 
-      router.push({ name: "tabs" });
+      router.push({ name: "agenda" });
     } catch (error) {
-      setToast({ message: "Echec de la connexion", color: "danger" });
+      setToast({ message: "Erreur de connexion", color: "danger" });
       console.error(error);
     }
   };
 
+  /**
+   * Logs the user into the app as an anonymous
+   */
   const authAnonymous = async () => {
     const auth = getAuth();
     try {
       await signInAnonymously(auth);
-      router.push({ name: "tabs" });
+      router.push({ name: "agenda" });
     } catch (error) {
-      setToast({ message: error, color: "danger" });
+      setToast({ message: "Erreur de connexion", color: "danger" });
+      console.error(error);
     }
   };
 
-  const authMobile = async () => {
-    const auth = getAuth();
-    const credential = new GoogleAuthProvider();
-    console.log(auth);
-    console.log(credential);
-    try {
-      await signInWithCredential(auth);
-      router.push({ name: "tabs" });
-    } catch (error) {
-      setToast({ message: error, color: "danger" });
-    }
-  };
-
+  /**
+   * Logs the user into the app with Google
+   *
+   * Creates an account if the user doesn't exist
+   */
   const authWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
     try {
       await signInWithPopup(auth, provider);
-      router.push({ name: "tabs" });
+      router.push({ name: "agenda" });
 
       // create user if it doesn't exist
       const user = await store.dispatch("getUser", {
@@ -108,7 +112,6 @@ export function useLoginMethods(
     swapMode,
     authWithGoogle,
     authAnonymous,
-    authMobile,
     authPassword,
     register,
   };

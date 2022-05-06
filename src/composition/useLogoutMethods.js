@@ -1,6 +1,9 @@
 import { getAuth, signOut } from "firebase/auth";
 
 export function useLogoutMethods(store, router) {
+  /**
+   * Logs out the user
+   */
   const logOut = async () => {
     try {
       const auth = getAuth();

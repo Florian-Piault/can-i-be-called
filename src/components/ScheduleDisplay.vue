@@ -26,22 +26,15 @@
 </template>
 
 <script lang="ts">
-interface Schedule {
-  mode: string;
-  date?: Date;
-  interval?: { start: Date; end: Date };
-  hours?: Date[];
-  repeat: string;
-}
 import { computed, defineComponent, Ref, toRefs } from "vue";
-import { IonCol, IonLabel, IonItemDivider, IonItem } from "@ionic/vue";
+import { IonCol, IonLabel, IonItem } from "@ionic/vue";
+import { Schedule } from "@/models";
 export default defineComponent({
   name: "DisplayeSchedule",
   props: ["data", "step"],
   components: {
     IonCol,
     IonLabel,
-
     IonItem,
   },
   setup(props) {
