@@ -109,10 +109,45 @@ const store = createStore({
         const schedules = [];
         _shop.schedules.forEach(async scheduleRef => {
           const schedule = await getDoc(scheduleRef);
-          schedules.push(schedule.data());
+          const data = schedule.data();
+
+          // formats : Firestore.Timestamp -> Date
+          let d = null;
+          if (data.date) {
+            d = new Date(
+              data.date.seconds * 1000 + data.date.nanoseconds / 1000000
+            );
+            data.date = d;
+          }
+
+          let i = null;
+          if (data.interval) {
+            i = {
+              start: new Date(
+                data.interval.start.seconds * 1000 +
+                  data.interval.start.nanoseconds / 1000000
+              ),
+              end: new Date(
+                data.interval.end.seconds * 1000 +
+                  data.interval.end.nanoseconds / 1000000
+              ),
+            };
+            data.interval = i;
+          }
+          let h = null;
+          if (data.hours) {
+            h = data.hours.map(
+              h => new Date(h.seconds * 1000 + h.nanoseconds / 1000000)
+            );
+            data.hours = h;
+          }
+
+          schedules.push(data);
         });
+
         return { ..._shop, schedules: schedules };
       });
+      console.log(_shops);
       return _shops;
     },
     async getProfilePictures() {

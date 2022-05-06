@@ -25,8 +25,18 @@
         </IonCardContent>
       </IonCard>
 
+      <IonCard v-else-if="isAnonymous">
+        <IonCardTitle>
+          <h1>Invité</h1>
+        </IonCardTitle>
+        <IonCardContent>
+          images:
+          <img v-for="(pic, idx) in profilePics" :key="idx" :src="pic" />
+        </IonCardContent>
+      </IonCard>
+
       <IonCard v-else>
-        <IonCardContent> is loading.. . </IonCardContent>
+        <IonCardContent> Chargement... </IonCardContent>
       </IonCard>
     </ion-content>
   </ion-page>
@@ -46,7 +56,8 @@ import {
 } from "@ionic/vue";
 import store from "@/store";
 import { computed, ref } from "@vue/reactivity";
-import { onBeforeMount } from "@vue/runtime-core";
+import { onBeforeMount, onUnmounted } from "@vue/runtime-core";
+import { getAuth } from "@firebase/auth";
 
 export default {
   name: "Profile",
@@ -64,9 +75,13 @@ export default {
   setup() {
     const user = ref(null);
     const profilePics = ref([]);
+    const isAnonymous = ref(false);
 
     onBeforeMount(async () => {
       const pics = await store.dispatch("getProfilePictures");
+      const auth = getAuth();
+      isAnonymous.value = auth.currentUser.isAnonymous;
+
       const _user = await store.dispatch("getUser", {
         db: store.state.database,
         id: computed(() => store.state.user).value.uid,
@@ -75,7 +90,12 @@ export default {
       profilePics.value = pics;
     });
 
-    return { user, profilePics };
+    onUnmounted(() => {
+      user.value = null;
+      profilePics.value = [];
+    });
+
+    return { user, profilePics, isAnonymous };
   },
 };
 </script>

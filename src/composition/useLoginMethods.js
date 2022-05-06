@@ -1,4 +1,9 @@
-import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  getAuth,
+  signInWithPopup,
+  signInAnonymously,
+} from "firebase/auth";
 
 export function useLoginMethods(
   { password, cPassword, mail, toLogin, store, router },
@@ -9,6 +14,16 @@ export function useLoginMethods(
     cPassword.value = "";
     mail.value = "";
     toLogin.value = !toLogin.value;
+  };
+
+  const authAnonymous = async () => {
+    const auth = getAuth();
+    try {
+      await signInAnonymously(auth);
+      router.push({ name: "tabs" });
+    } catch (error) {
+      setToast(error.message);
+    }
   };
 
   const authWithGoogle = async () => {
@@ -40,5 +55,5 @@ export function useLoginMethods(
     }
   };
 
-  return { swapMode, authWithGoogle };
+  return { swapMode, authWithGoogle, authAnonymous };
 }

@@ -48,6 +48,11 @@
               <p class="btn-text"><b>Se connecter Google</b></p>
             </div>
           </ion-item>
+          <ion-item>
+            <div class="anonymous-btn" @click="authAnonymous">
+              Accéder sans se connecter
+            </div>
+          </ion-item>
           <ion-card-subtitle class="card-subtitle">
             Vous n'avez pas encore de compte ?
             <ion-button @click="swapMode" fill="clear"
@@ -199,6 +204,15 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.anonymous-btn {
+  background: var(--ion-color-medium);
+  color: var(--ion-color-light);
+  padding: 0.5em 1em;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  cursor: pointer;
 }
 
 @media screen and (min-width: 700px) {

@@ -63,7 +63,6 @@ router.beforeEach((to, from) => {
     if (auth.currentUser) {
       store.commit("setAuthentication", user);
     }
-
     const isLogged = computed(() => store.getters.isLogged);
     if (to.meta.requiresAuth && !isLogged.value) {
       return router.push({ name: "login" });

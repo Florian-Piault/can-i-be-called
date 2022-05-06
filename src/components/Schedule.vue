@@ -27,11 +27,7 @@
               mode="date"
               v-model="date"
               :model-config="modelConfig"
-            />
-            <!-- <ion-button @click="addDate" expand="block">
-              <ion-icon :icon="addCircleOutline" />
-              <ion-label>Choisir le jour</ion-label>
-            </ion-button> -->
+            />->
           </template>
           <template v-if="step === 1">
             <DatePicker
@@ -40,10 +36,6 @@
               :model-config="modelConfig"
               is24hr
             />
-            <!-- <ion-button @click="addDate" expand="block">
-              <ion-icon :icon="addCircleOutline" />
-              <ion-label>Choisir l'heure de début</ion-label>
-            </ion-button> -->
           </template>
           <template v-if="step === 2">
             <DatePicker
@@ -52,10 +44,6 @@
               :model-config="modelConfig"
               is24hr
             />
-            <!-- <ion-button @click="addDate" expand="block">
-              <ion-icon :icon="addCircleOutline" />
-              <ion-label>Choisir l'heure de fin</ion-label>
-            </ion-button> -->
           </template>
           <div class="btn-side-by-side">
             <ion-button
@@ -87,7 +75,6 @@
         </template>
 
         <!-- RESULTS DISPLAY -->
-        <!-- <ScheduleDisplaySteps :data="displayedData" :step="step" /> -->
         <ScheduleDisplaySteps
           :modeId="mode.id"
           :dDate="displayedDate"
@@ -243,6 +230,13 @@ export default defineComponent({
     // --- methods
     const { setToast } = useGlobalMethods();
 
+    /**
+     * Closes the modale
+     *
+     * If there are no changes, and the **save** mode is selected, nothing is done
+     *
+     * @param mode {string} "save" | "cancel"
+     */
     const close = (mode: "save" | "cancel") => {
       try {
         if (mode === "save" && changes.value < 1)
@@ -252,7 +246,7 @@ export default defineComponent({
       } catch (e) {
         console.error(e);
       } finally {
-        //--- reset data
+        //--- resets data
         interval.value = { start: null, end: null };
         step.value = 0;
         date.value = new Date();
