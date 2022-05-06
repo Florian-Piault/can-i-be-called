@@ -99,9 +99,14 @@
   <ion-buttons class="btn-side-by-side">
     <ion-button @click="close('cancel')" color="danger">
       <ion-icon :icon="closeCircleOutline" />
-      <ion-label>Annuler</ion-label>
+      <ion-label v-if="shopId === currentUserId">Annuler</ion-label>
+      <ion-label v-else>Fermer</ion-label>
     </ion-button>
-    <ion-button @click="close('save')" color="success">
+    <ion-button
+      v-if="shopId === currentUserId"
+      @click="close('save')"
+      color="success"
+    >
       <ion-icon :icon="checkmarkCircleOutline" />
       <ion-label>Valider</ion-label>
     </ion-button>
@@ -240,7 +245,7 @@ export default defineComponent({
     const close = (mode: "save" | "cancel") => {
       try {
         if (mode === "save" && changes.value < 1)
-          return setToast({ msg: "Veuillez choisir un horaire" });
+          return setToast({ message: "Veuillez choisir un horaire" });
         if (mode === "cancel") modalController.dismiss();
         else modalController.dismiss(tmpSchedule.value);
       } catch (e) {
@@ -256,7 +261,7 @@ export default defineComponent({
 
     const addDate = (event: Event, prev: boolean) => {
       if (step.value === 0) {
-        if (!date.value) return setToast({ msg: "Sélectionnez une date." });
+        if (!date.value) return setToast({ message: "Sélectionnez une date." });
         return step.value++;
       }
       if (step.value === 1) {
@@ -286,7 +291,7 @@ export default defineComponent({
     const addInterval = () => {
       // errors
       if (!interval.value.start || !interval.value.end)
-        return setToast({ msg: "Sélectionnez un intervalle." });
+        return setToast({ message: "Sélectionnez un intervalle." });
       const _interval = {
         mode: "INTERVAL",
         interval: interval.value,

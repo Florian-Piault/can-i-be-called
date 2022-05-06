@@ -45,6 +45,20 @@ const store = createStore({
       });
       return !!_user;
     },
+    async createUserWithEmail({ commit }, { db, user }) {
+      const userDoc = doc(db, "user", user.uid);
+      const _user = await setDoc(userDoc, {
+        firstname: null,
+        lastname: null,
+        email: user.email,
+        displayName: user.email.split("@")[0],
+        phone: user.phoneNumber,
+        uid: user.uid,
+        schedules: [],
+        isShop: false,
+      });
+      return !!_user;
+    },
     async getUsers({ commit }, { db }) {
       const users = await getDocs(collection(db, "user"));
       const _users = [];

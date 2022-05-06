@@ -9,7 +9,12 @@
     <ion-content>
       <ion-card class="wrapper">
         <!-- login -->
-        <form action="post" v-show="toLogin">
+        <form
+          action="post"
+          v-show="toLogin"
+          @keyup.enter="authPassword"
+          @submit.prevent="authPassword"
+        >
           <ion-card-title class="card-title">Connexion</ion-card-title>
           <ion-card-content>
             <ion-item class="field">
@@ -37,25 +42,6 @@
           <ion-item>
             <ion-button type="submit" fill="solid">Se connecter</ion-button>
           </ion-item>
-          <ion-item>
-            <!-- <div class="google-btn" @click="authWithGoogle">
-              <div class="google-icon-wrapper">
-                <img
-                  class="google-icon"
-                  src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
-                />
-              </div>
-              <p class="btn-text"><b>Se connecter Google</b></p>
-            </div> -->
-            <ion-button @click="authWithGoogle" fill="solid" color="medium"
-              >Se connecter avec Google</ion-button
-            >
-          </ion-item>
-          <ion-item>
-            <ion-button @click="authAnonymous" fill="solid" color="medium"
-              >Se connecter en invité</ion-button
-            >
-          </ion-item>
           <ion-card-subtitle class="card-subtitle">
             Vous n'avez pas encore de compte ?
             <ion-button @click="swapMode" fill="clear"
@@ -64,7 +50,12 @@
           </ion-card-subtitle>
         </form>
         <!-- register -->
-        <form action="post" v-show="!toLogin">
+        <form
+          action="post"
+          v-show="!toLogin"
+          @keyup.enter="register"
+          @submit.prevent="register"
+        >
           <ion-card-title class="card-title">S'enregistrer</ion-card-title>
           <ion-card-content>
             <ion-item class="field">
@@ -88,17 +79,6 @@
                 required
               ></ion-input>
             </ion-item>
-            <ion-item class="field">
-              <ion-label position="floating" color="primary"
-                >Confirmer le mot de passe</ion-label
-              >
-              <ion-input
-                clear-input="true"
-                type="password"
-                v-model="cPassword"
-                required
-              ></ion-input>
-            </ion-item>
           </ion-card-content>
           <ion-item>
             <ion-button type="submit" fill="solid">S'inscrire</ion-button>
@@ -110,6 +90,20 @@
             >
           </ion-card-subtitle>
         </form>
+        <template v-if="plateforms.includes('desktop')">
+          <ion-buttons>
+            <ion-button @click="authWithGoogle" fill="solid" color="medium"
+              >Se connecter avec Google</ion-button
+            >
+            <ion-button @click="authAnonymous" fill="solid" color="medium"
+              >Se connecter en invité</ion-button
+            >
+
+            <!-- <ion-button @click="authMobile" fill="solid" color="medium"
+              >IOS</ion-button
+            > -->
+          </ion-buttons>
+        </template>
       </ion-card>
     </ion-content>
   </ion-page>
@@ -130,12 +124,14 @@ import {
   IonInput,
   IonLabel,
   IonButton,
+  IonButtons,
 } from "@ionic/vue";
 import { useGlobalMethods } from "@/composition/useGlobalMethods";
 import { useLoginMethods } from "@/composition/useLoginMethods";
 import { Ref, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import { getPlatforms } from "@ionic/vue";
 export default {
   name: "Login",
   components: {
@@ -152,25 +148,22 @@ export default {
     IonInput,
     IonLabel,
     IonButton,
+    IonButtons,
   },
   setup() {
     const store = useStore();
     const router = useRouter();
     const mail: Ref<string> = ref("");
     const password: Ref<string> = ref("");
-    const cPassword: Ref<string> = ref("");
     const toLogin: Ref<boolean> = ref(true);
     const { setToast } = useGlobalMethods();
-
+    const plateforms = getPlatforms();
     return {
       mail,
       password,
-      cPassword,
       toLogin,
-      ...useLoginMethods(
-        { mail, password, cPassword, toLogin, store, router },
-        setToast
-      ),
+      plateforms,
+      ...useLoginMethods({ mail, password, toLogin, store, router }, setToast),
     };
   },
 };

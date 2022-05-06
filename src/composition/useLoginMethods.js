@@ -3,17 +3,52 @@ import {
   getAuth,
   signInWithPopup,
   signInAnonymously,
+  signInWithCredential,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 
 export function useLoginMethods(
-  { password, cPassword, mail, toLogin, store, router },
+  { password, mail, toLogin, store, router },
   setToast
 ) {
   const swapMode = () => {
     password.value = "";
-    cPassword.value = "";
     mail.value = "";
     toLogin.value = !toLogin.value;
+  };
+
+  const register = async () => {
+    const auth = getAuth();
+    try {
+      const credentials = await createUserWithEmailAndPassword(
+        auth,
+        mail.value,
+        password.value
+      );
+      await store.dispatch("createUserWithEmail", {
+        db: store.state.database,
+        user: credentials.user,
+      });
+      router.push({ name: "tabs" });
+    } catch (e) {
+      setToast({
+        message: e.message,
+        color: "error",
+      });
+    }
+  };
+
+  const authPassword = async () => {
+    const auth = getAuth();
+    try {
+      await signInWithEmailAndPassword(auth, mail.value, password.value);
+
+      router.push({ name: "tabs" });
+    } catch (error) {
+      setToast({ message: "Echec de la connexion", color: "danger" });
+      console.error(error);
+    }
   };
 
   const authAnonymous = async () => {
@@ -22,7 +57,20 @@ export function useLoginMethods(
       await signInAnonymously(auth);
       router.push({ name: "tabs" });
     } catch (error) {
-      setToast(error.message);
+      setToast({ message: error, color: "danger" });
+    }
+  };
+
+  const authMobile = async () => {
+    const auth = getAuth();
+    const credential = new GoogleAuthProvider();
+    console.log(auth);
+    console.log(credential);
+    try {
+      await signInWithCredential(auth);
+      router.push({ name: "tabs" });
+    } catch (error) {
+      setToast({ message: error, color: "danger" });
     }
   };
 
@@ -45,6 +93,7 @@ export function useLoginMethods(
         });
       }
     } catch (e) {
+      setToast({ message: e.message, color: "danger" });
       const errorCode = e.code;
       const errorMessage = e.message;
       const email = e.email;
@@ -55,5 +104,12 @@ export function useLoginMethods(
     }
   };
 
-  return { swapMode, authWithGoogle, authAnonymous };
+  return {
+    swapMode,
+    authWithGoogle,
+    authAnonymous,
+    authMobile,
+    authPassword,
+    register,
+  };
 }
