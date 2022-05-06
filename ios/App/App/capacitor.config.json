@@ -1,0 +1,6 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "Can I be called",
+	"webDir": "dist",
+	"bundledWebRuntime": false
+}
