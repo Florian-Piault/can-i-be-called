@@ -1,12 +1,12 @@
 <template>
   <ion-header>
     <ion-toolbar>
-      <ion-title>{{ title }}</ion-title>
+      <ion-title>{{ title }} </ion-title>
     </ion-toolbar>
   </ion-header>
   <ion-content class="ion-padding content-column">
     <div class="calendar-wrapper">
-      <div class="datepicker-wrapper">
+      <div v-if="shopId === currentUserId" class="datepicker-wrapper">
         <!--  MODE SELECTION -->
         <IonItem>
           <IonSelect
@@ -124,16 +124,13 @@
 <script lang="ts">
 // todo -> feedback schedule added (toast?)
 // todo -> calendar : see directly schedules
-// todo -> db get/post
 // todo -> profile page
-
-// todo -> login : get/post
 // todo -> login : mail+password
-// todo -> login : other providers
+
 interface Schedule {
   mode: string;
   date?: Date;
-  interval?: object;
+  interval?: { start: Date; end: Date };
   hours?: Date[];
   repeat: string;
 }
@@ -168,12 +165,12 @@ import {
 } from "@ionic/vue";
 import { computed, ref, toRefs } from "@vue/reactivity";
 import { useGlobalMethods } from "@/composition/useGlobalMethods";
-import { defineComponent, Ref, watch } from "vue";
+import { defineComponent, Ref } from "vue";
 import ScheduleDisplaySteps from "./ScheduleDisplaySteps.vue";
 import ScheduleDisplay from "./ScheduleDisplay.vue";
 export default defineComponent({
   name: "Schedule",
-  props: ["schedule", "title"],
+  props: ["schedule", "title", "currentUserId", "shopId"],
   components: {
     IonContent,
     IonHeader,

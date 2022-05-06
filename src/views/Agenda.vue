@@ -28,7 +28,10 @@
       </ion-slides>
     </ion-content>
 
-    <ion-content :fullscreen="true" v-else> No content </ion-content>
+    <ion-content :fullscreen="true" v-else>
+      <!-- create loader -->
+      is loading...
+    </ion-content>
   </ion-page>
 </template>
 
@@ -110,8 +113,10 @@ export default defineComponent({
         swipeToClose: false,
         backdropDismiss: false,
         componentProps: {
-          title: shop.displayName,
-          schedule: shop.schedules,
+          shopId: shop.uid as Ref<string>,
+          title: shop.displayName as Ref<string>,
+          schedule: shop.schedules as Ref<Schedule[]>,
+          currentUserId: user.value.uid as string,
         },
       });
       await modal.present();
