@@ -53,10 +53,8 @@ if (Capacitor.isNativePlatform()) {
   initializeAuth(fbApp, {
     persistence: indexedDBLocalPersistence,
   });
-} else
-  initializeAuth(fbApp, {
-    persistence: browserLocalPersistence,
-  });
+} else getAuth(fbApp);
+
 store.state.database = getFirestore(fbApp);
 
 const app = createApp(App).use(IonicVue).use(store).use(router);

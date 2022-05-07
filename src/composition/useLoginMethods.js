@@ -5,7 +5,9 @@ import {
   signInAnonymously,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithRedirect,
 } from "firebase/auth";
+import { provide } from "vue";
 
 export function useLoginMethods(
   { password, mail, toLogin, store, router },
@@ -49,10 +51,8 @@ export function useLoginMethods(
    */
   const authPassword = async () => {
     const auth = getAuth();
-    setToast({ message: auth.config.sdkClientVersion });
     try {
       await signInWithEmailAndPassword(auth, mail.value, password.value);
-
       router.push({ name: "agenda" });
     } catch (error) {
       setToast({ message: "Erreur de connexion", color: "danger" });
@@ -80,9 +80,8 @@ export function useLoginMethods(
    * Creates an account if the user doesn't exist
    */
   const authWithGoogle = async () => {
-    setToast({ message: "Connexion...", color: "info" });
-    const provider = new GoogleAuthProvider();
     const auth = getAuth();
+    const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
       router.push({ name: "agenda" });
