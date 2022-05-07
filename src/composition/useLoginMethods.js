@@ -49,6 +49,7 @@ export function useLoginMethods(
    */
   const authPassword = async () => {
     const auth = getAuth();
+    setToast({ message: auth.config.sdkClientVersion });
     try {
       await signInWithEmailAndPassword(auth, mail.value, password.value);
 
@@ -79,6 +80,7 @@ export function useLoginMethods(
    * Creates an account if the user doesn't exist
    */
   const authWithGoogle = async () => {
+    setToast({ message: "Connexion...", color: "info" });
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
     try {

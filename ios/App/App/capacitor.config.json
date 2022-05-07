@@ -2,5 +2,13 @@
 	"appId": "io.ionic.cibc",
 	"appName": "Can I be called",
 	"webDir": "dist",
-	"bundledWebRuntime": false
+	"bundledWebRuntime": false,
+	"plugins": {
+		"FirebaseAuthentication": {
+			"skipNativeAuth": false,
+			"providers": [
+				"google.com"
+			]
+		}
+	}
 }

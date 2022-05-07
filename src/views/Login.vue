@@ -104,16 +104,33 @@
             >
           </ion-card-subtitle>
         </form>
-        <ion-buttons>
-          <template v-if="plateforms.includes('desktop')">
-            <ion-button @click="authWithGoogle" fill="solid" color="medium"
-              >Se connecter avec Google</ion-button
+        <ion-item-divider></ion-item-divider>
+        <ion-grid>
+          <ion-row class="row-center">
+            <template
+              v-if="
+                plateforms.includes('desktop') ||
+                plateforms.includes('mobileweb')
+              "
             >
-          </template>
-          <ion-button @click="authAnonymous" fill="solid" color="medium"
-            >Se connecter en invité</ion-button
-          >
-        </ion-buttons>
+              <ion-button
+                @click="authWithGoogle"
+                fill="clear"
+                color="primary"
+                shape="round"
+              >
+                <ion-icon :icon="logoGoogle"></ion-icon
+              ></ion-button>
+            </template>
+            <ion-button
+              @click="authAnonymous"
+              fill="clear"
+              color="primary"
+              shape="round"
+              >Accéder sans se connecter</ion-button
+            >
+          </ion-row>
+        </ion-grid>
       </ion-card>
     </ion-content>
   </ion-page>
@@ -134,8 +151,10 @@ import {
   IonInput,
   IonLabel,
   IonButton,
-  IonButtons,
   IonIcon,
+  IonGrid,
+  IonRow,
+  IonItemDivider,
 } from "@ionic/vue";
 import { useGlobalMethods } from "@/composition/useGlobalMethods";
 import { useLoginMethods } from "@/composition/useLoginMethods";
@@ -143,7 +162,11 @@ import { Ref, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { getPlatforms } from "@ionic/vue";
-import { eyeOutline as eye, eyeOffOutline as eyeOff } from "ionicons/icons";
+import {
+  eyeOutline as eye,
+  eyeOffOutline as eyeOff,
+  logoGoogle,
+} from "ionicons/icons";
 
 export default {
   name: "Login",
@@ -161,8 +184,10 @@ export default {
     IonInput,
     IonLabel,
     IonButton,
-    IonButtons,
     IonIcon,
+    IonGrid,
+    IonRow,
+    IonItemDivider,
   },
   setup() {
     const store = useStore();
@@ -194,6 +219,7 @@ export default {
       passwordIcon,
       toLogin,
       plateforms,
+      logoGoogle,
       eye,
       eyeOff,
       togglePassword,
@@ -242,5 +268,11 @@ export default {
   position: relative !important;
   top: 2rem !important;
   margin: 0 auto !important;
+}
+
+.row-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

@@ -12,7 +12,10 @@ import {
   setPersistence,
   browserLocalPersistence,
   getAuth,
+  indexedDBLocalPersistence,
+  initializeAuth,
 } from "firebase/auth";
+import { Capacitor } from "@capacitor/core";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/vue/css/core.css";
@@ -33,8 +36,6 @@ import "@ionic/vue/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 
-const app = createApp(App).use(IonicVue).use(store).use(router);
-
 const firebaseConfig = {
   apiKey: "AIzaSyD5_UgA0JEDayMCgCCbMfOM3ngHUkDAL1c",
   authDomain: "can-i-be-called.firebaseapp.com",
@@ -48,9 +49,17 @@ const firebaseConfig = {
 };
 
 const fbApp = initializeApp(firebaseConfig);
+if (Capacitor.isNativePlatform()) {
+  initializeAuth(fbApp, {
+    persistence: indexedDBLocalPersistence,
+  });
+} else
+  initializeAuth(fbApp, {
+    persistence: browserLocalPersistence,
+  });
 store.state.database = getFirestore(fbApp);
-const auth = getAuth();
-setPersistence(auth, browserLocalPersistence);
+
+const app = createApp(App).use(IonicVue).use(store).use(router);
 
 router.isReady().then(() => {
   app.mount("#app");
