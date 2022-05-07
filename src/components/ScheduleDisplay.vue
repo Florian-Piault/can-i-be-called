@@ -1,41 +1,33 @@
 <template>
-  <IonItem>
-    <IonCol>
-      <IonLabel>
-        <h2>Mode</h2>
-        <p>{{ mode }}</p>
-      </IonLabel>
-      <IonLabel>
-        <h2>Date</h2>
-        <p>{{ date }}</p>
-      </IonLabel>
-      <IonLabel>
-        <h2>Interval</h2>
-        <p>{{ interval }}</p>
-      </IonLabel>
-      <IonLabel>
-        <h2>Hours</h2>
-        <p>{{ hours }}</p>
-      </IonLabel>
-      <IonLabel>
-        <h2>Repeat</h2>
-        <p>{{ repeat }}</p>
-      </IonLabel>
-    </IonCol>
+  <!-- RANGE -->
+  <IonItem v-if="mode === 'Sur un interval'">
+    Du {{ interval.start }} au {{ interval.end }}
+  </IonItem>
+
+  <!-- IonChip -->
+  <!-- ONE_DAY -->
+  <IonItem v-else>
+    <IonIcon :icon="calendarOutline" />
+    <b>{{ date }}</b> :
+    <div>{{ hours[0] }} &rarr; {{ hours[1] }}</div>
   </IonItem>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, Ref, toRefs } from "vue";
-import { IonCol, IonLabel, IonItem } from "@ionic/vue";
+import { IonCol, IonLabel, IonItem, IonIcon } from "@ionic/vue";
+import { timeOutline, calendarOutline } from "ionicons/icons";
 import { Schedule } from "@/models";
+import { DatePicker } from "v-calendar";
 export default defineComponent({
-  name: "DisplayeSchedule",
+  name: "DisplayedSchedule",
   props: ["data", "step"],
   components: {
-    IonCol,
-    IonLabel,
+    // IonCol,
+    // IonLabel,
     IonItem,
+    // DatePicker,
+    IonIcon,
   },
   setup(props) {
     const { data: schedule } = toRefs(props) as { data: Ref<Schedule> };
@@ -89,6 +81,8 @@ export default defineComponent({
       interval,
       hours,
       repeat,
+      timeOutline,
+      calendarOutline,
     };
   },
 });

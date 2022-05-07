@@ -29,8 +29,7 @@
     </ion-content>
 
     <ion-content :fullscreen="true" v-else>
-      <!-- create loader -->
-      is loading...
+      <IonSpinner name="crescent" />
     </ion-content>
   </ion-page>
 </template>
@@ -45,6 +44,7 @@ import {
   IonCard,
   IonCardTitle,
   IonCardContent,
+  IonSpinner,
   modalController,
 } from "@ionic/vue";
 import { IonSlides, IonSlide } from "@ionic/vue";
@@ -64,6 +64,7 @@ export default defineComponent({
   components: {
     IonSlide,
     IonSlides,
+    IonSpinner,
     IonHeader,
     IonToolbar,
     IonTitle,

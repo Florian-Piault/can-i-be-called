@@ -7,7 +7,6 @@ import {
   signInWithEmailAndPassword,
   signInWithRedirect,
 } from "firebase/auth";
-import { provide } from "vue";
 
 export function useLoginMethods(
   { password, mail, toLogin, store, router },

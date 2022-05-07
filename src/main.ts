@@ -53,7 +53,10 @@ if (Capacitor.isNativePlatform()) {
   initializeAuth(fbApp, {
     persistence: indexedDBLocalPersistence,
   });
-} else getAuth(fbApp);
+} else {
+  const auth = getAuth(fbApp);
+  setPersistence(auth, browserLocalPersistence);
+}
 
 store.state.database = getFirestore(fbApp);
 

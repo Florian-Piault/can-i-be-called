@@ -84,7 +84,10 @@
         />
       </div>
 
-      <div class="schedule-display">
+      <div class="schedule-display" v-if="allSchedules.length > 0">
+        <IonLabel>
+          <h2>Indisponibilité{{ allSchedules.length > 1 ? "s" : "" }}:</h2>
+        </IonLabel>
         <ScheduleDisplay
           v-for="(s, idx) in allSchedules"
           :key="'schedule-' + idx"

@@ -36,7 +36,9 @@
       </IonCard>
 
       <IonCard v-else>
-        <IonCardContent> Chargement... </IonCardContent>
+        <IonCardContent>
+          <IonSpinner name="crescent" />
+        </IonCardContent>
       </IonCard>
     </ion-content>
   </ion-page>
@@ -53,6 +55,7 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardTitle,
+  IonSpinner,
 } from "@ionic/vue";
 import store from "@/store";
 import { computed, ref } from "@vue/reactivity";
@@ -71,6 +74,7 @@ export default {
     IonCardContent,
     IonCardHeader,
     IonCardTitle,
+    IonSpinner,
   },
   setup() {
     const user = ref(null);
@@ -116,5 +120,11 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.schedule-display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 </style>
