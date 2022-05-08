@@ -27,7 +27,7 @@
               mode="date"
               v-model="date"
               :model-config="modelConfig"
-            />->
+            />
           </template>
           <template v-if="step === 1">
             <DatePicker
@@ -92,7 +92,6 @@
           v-for="(s, idx) in allSchedules"
           :key="'schedule-' + idx"
           :data="s"
-          :step="null"
         />
       </div>
     </div>

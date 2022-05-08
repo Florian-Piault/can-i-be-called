@@ -1,33 +1,52 @@
 <template>
   <!-- RANGE -->
   <IonItem v-if="mode === 'Sur un interval'">
-    Du {{ interval.start }} au {{ interval.end }}
+    <IonGrid>
+      <IonRow>
+        <IonIcon :icon="calendarOutline" />
+        {{ interval.start }} &rarr; {{ interval.end }}
+      </IonRow>
+    </IonGrid>
   </IonItem>
 
-  <!-- IonChip -->
   <!-- ONE_DAY -->
   <IonItem v-else>
-    <IonIcon :icon="calendarOutline" />
-    <b>{{ date }}</b> :
-    <div>{{ hours[0] }} &rarr; {{ hours[1] }}</div>
+    <IonGrid>
+      <IonRow>
+        <IonIcon :icon="calendarOutline" />
+        <b>{{ date }}</b> :
+      </IonRow>
+      <IonRow>
+        <div>{{ hours[0] }} &rarr; {{ hours[1] }}</div>
+      </IonRow>
+    </IonGrid>
   </IonItem>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, Ref, toRefs } from "vue";
-import { IonCol, IonLabel, IonItem, IonIcon } from "@ionic/vue";
+import {
+  IonCol,
+  IonLabel,
+  IonItem,
+  IonIcon,
+  IonGrid,
+  IonRow,
+} from "@ionic/vue";
 import { timeOutline, calendarOutline } from "ionicons/icons";
 import { Schedule } from "@/models";
 import { DatePicker } from "v-calendar";
 export default defineComponent({
   name: "DisplayedSchedule",
-  props: ["data", "step"],
+  props: ["data"],
   components: {
     // IonCol,
     // IonLabel,
     IonItem,
     // DatePicker,
     IonIcon,
+    IonGrid,
+    IonRow,
   },
   setup(props) {
     const { data: schedule } = toRefs(props) as { data: Ref<Schedule> };
@@ -55,15 +74,11 @@ export default defineComponent({
           day: "numeric",
           month: "long",
           year: "numeric",
-          hour: "numeric",
-          minute: "numeric",
         }),
         end: i.end.toLocaleString([], {
           day: "numeric",
           month: "long",
           year: "numeric",
-          hour: "numeric",
-          minute: "numeric",
         }),
       };
     });

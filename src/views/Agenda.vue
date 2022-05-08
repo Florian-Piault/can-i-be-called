@@ -96,8 +96,8 @@ export default defineComponent({
           () => import("../components/Schedule.vue")
         ),
         cssClass: "my-custom-class",
-        swipeToClose: false,
-        backdropDismiss: false,
+        swipeToClose: true,
+        backdropDismiss: true,
         componentProps: {
           shopId: shop.uid as Ref<string>,
           title: shop.displayName as Ref<string>,

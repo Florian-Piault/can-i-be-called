@@ -12,6 +12,7 @@
         </ion-toolbar>
       </ion-header>
 
+      <!-- USER -->
       <IonCard v-if="user">
         <IonCardHeader class="profile-header">
           <img class="bg" :src="user.profilePic" alt="profile picture" />
@@ -20,19 +21,28 @@
           </IonCardTitle>
         </IonCardHeader>
         <IonCardContent>
-          images:
-          <img v-for="(pic, idx) in profilePics" :key="idx" :src="pic" />
+          <template v-if="schedules.length < 1">
+            Vous n'avez pas d'indisponibilités de renseignées</template
+          >
+          <div v-else class="schedule-display">
+            <IonLabel>
+              <h2>Indisponibilité{{ schedules.length > 1 ? "s" : "" }}:</h2>
+            </IonLabel>
+            <ScheduleDisplay
+              v-for="(s, idx) in schedules"
+              :key="'schedule-' + idx"
+              :data="s"
+            />
+          </div>
         </IonCardContent>
       </IonCard>
 
+      <!-- ANONYMOUS -->
       <IonCard v-else-if="isAnonymous">
         <IonCardTitle>
           <h1>Invité</h1>
         </IonCardTitle>
-        <IonCardContent>
-          images:
-          <img v-for="(pic, idx) in profilePics" :key="idx" :src="pic" />
-        </IonCardContent>
+        <IonCardContent> </IonCardContent>
       </IonCard>
 
       <IonCard v-else>
@@ -56,12 +66,19 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonSpinner,
+  IonLabel,
 } from "@ionic/vue";
 import store from "@/store";
-import { computed, ref } from "@vue/reactivity";
-import { onBeforeMount, onUnmounted } from "@vue/runtime-core";
-import { getAuth } from "@firebase/auth";
-
+import { computed, ref, Ref } from "@vue/reactivity";
+import {
+  onBeforeMount,
+  watch,
+  onMounted,
+  watchEffect,
+} from "@vue/runtime-core";
+import { getAuth, onAuthStateChanged } from "@firebase/auth";
+import { Schedule } from "@/models";
+import ScheduleDisplay from "@/components/ScheduleDisplay.vue";
 export default {
   name: "Profile",
   components: {
@@ -75,32 +92,28 @@ export default {
     IonCardHeader,
     IonCardTitle,
     IonSpinner,
+    ScheduleDisplay,
+    IonLabel,
   },
   setup() {
     const user = ref(null);
     const profilePics = ref([]);
     const isAnonymous = ref(false);
+    const schedules: Ref<Schedule[]> = ref([]);
 
-    onBeforeMount(async () => {
-      const pics = await store.dispatch("getProfilePictures");
-      const auth = getAuth();
-      isAnonymous.value = auth.currentUser.isAnonymous;
-
-      const _user = await store.dispatch("getUser", {
-        db: store.state.database,
-        id: computed(() => store.state.user).value.uid,
+    onMounted(() => {
+      onAuthStateChanged(getAuth(), async _user => {
+        isAnonymous.value = store.state.user.isAnonymous;
+        const userSchedules = await store.dispatch("getUserSchedules", {
+          db: store.state.database,
+          userId: _user.uid,
+        });
+        schedules.value = userSchedules;
+        user.value = _user;
       });
-      user.value = _user;
-      profilePics.value = pics;
     });
 
-    onUnmounted(() => {
-      user.value = null;
-      isAnonymous.value = false;
-      profilePics.value = [];
-    });
-
-    return { user, profilePics, isAnonymous };
+    return { user, profilePics, isAnonymous, schedules };
   },
 };
 </script>

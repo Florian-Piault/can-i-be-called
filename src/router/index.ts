@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from "@ionic/vue-router";
-// import { RouteRecordRaw } from "vue-router";
+import { RouteRecordRaw } from "vue-router";
 import Tabs from "../views/Tabs.vue";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import store from "@/store/index.js";
 import { computed } from "vue";
 
-const routes: Array<any> = [
+const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     redirect: "/login",
