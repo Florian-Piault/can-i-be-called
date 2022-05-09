@@ -15,12 +15,12 @@
       <!-- USER -->
       <IonCard v-if="user">
         <IonCardHeader class="profile-header">
-          <img class="bg" :src="user.profilePic" alt="profile picture" />
+          <!-- <img class="bg" :src="user.profilePic" alt="profile picture" /> -->
           <IonCardTitle>
             <h1>{{ user.displayName }}</h1>
           </IonCardTitle>
         </IonCardHeader>
-        <IonCardContent>
+        <IonCardContent v-if="!isLoading">
           <template v-if="schedules.length < 1">
             Vous n'avez pas d'indisponibilités de renseignées</template
           >
@@ -34,6 +34,11 @@
               :data="s"
             />
           </div>
+        </IonCardContent>
+        <IonCardContent v-else>
+          <IonCardContent>
+            <IonSpinner name="crescent" />
+          </IonCardContent>
         </IonCardContent>
       </IonCard>
 
@@ -49,6 +54,18 @@
         <IonCardContent>
           <IonSpinner name="crescent" />
         </IonCardContent>
+      </IonCard>
+      <IonCard class="full">
+        <i>Work In Progress...</i>
+        <Schedule
+          v-if="user && user.isShop && schedules"
+          :schedule="schedules"
+          title="Ajouter une indisponibilité"
+          :currentUserId="user.uid"
+          :shopId="user.uid"
+          :notModal="true"
+        ></Schedule>
+        <IonSpinner v-else name="crescent" />
       </IonCard>
     </ion-content>
   </ion-page>
@@ -70,15 +87,12 @@ import {
 } from "@ionic/vue";
 import store from "@/store";
 import { computed, ref, Ref } from "@vue/reactivity";
-import {
-  onBeforeMount,
-  watch,
-  onMounted,
-  watchEffect,
-} from "@vue/runtime-core";
+import { onMounted } from "@vue/runtime-core";
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
-import { Schedule } from "@/models";
+import { Schedule as MSchedule } from "@/models";
 import ScheduleDisplay from "@/components/ScheduleDisplay.vue";
+import Schedule from "@/components/Schedule.vue";
+
 export default {
   name: "Profile",
   components: {
@@ -94,26 +108,35 @@ export default {
     IonSpinner,
     ScheduleDisplay,
     IonLabel,
+    Schedule,
   },
   setup() {
     const user = ref(null);
     const profilePics = ref([]);
     const isAnonymous = ref(false);
-    const schedules: Ref<Schedule[]> = ref([]);
+    const schedules: Ref<MSchedule[]> = ref([]);
+    const isLoading = ref(true);
 
     onMounted(() => {
       onAuthStateChanged(getAuth(), async _user => {
-        isAnonymous.value = store.state.user.isAnonymous;
-        const userSchedules = await store.dispatch("getUserSchedules", {
+        user.value = await store.dispatch("getUser", {
           db: store.state.database,
-          userId: _user.uid,
+          id: _user.uid,
         });
+        const userSchedules: MSchedule[] = await store.dispatch(
+          "getUserSchedules",
+          {
+            db: store.state.database,
+            userId: _user.uid,
+          }
+        );
         schedules.value = userSchedules;
-        user.value = _user;
+        isAnonymous.value = _user.isAnonymous;
+        isLoading.value = false;
       });
     });
 
-    return { user, profilePics, isAnonymous, schedules };
+    return { user, profilePics, isAnonymous, schedules, isLoading };
   },
 };
 </script>
@@ -139,5 +162,9 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.full {
+  height: 100%;
 }
 </style>

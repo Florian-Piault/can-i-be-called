@@ -152,7 +152,7 @@ import ScheduleDisplay from "./ScheduleDisplay.vue";
 import { Schedule, Mode } from "@/models/index";
 export default defineComponent({
   name: "Schedule",
-  props: ["schedule", "title", "currentUserId", "shopId"],
+  props: ["schedule", "title", "currentUserId", "shopId", "notModal"],
   components: {
     IonContent,
     IonHeader,
