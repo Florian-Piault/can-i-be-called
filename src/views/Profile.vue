@@ -55,7 +55,7 @@
           <IonSpinner name="crescent" />
         </IonCardContent>
       </IonCard>
-      <IonCard class="full">
+      <IonCard v-if="!isAnonymous" class="full">
         <i>Work In Progress...</i>
         <Schedule
           v-if="user && user.isShop && schedules"
@@ -123,16 +123,18 @@ export default {
           db: store.state.database,
           id: _user.uid,
         });
-        const userSchedules: MSchedule[] = await store.dispatch(
-          "getUserSchedules",
-          {
-            db: store.state.database,
-            userId: _user.uid,
-          }
-        );
-        schedules.value = userSchedules;
-        isAnonymous.value = _user.isAnonymous;
-        isLoading.value = false;
+        if (!user.isAnonymous) {
+          const userSchedules: MSchedule[] = await store.dispatch(
+            "getUserSchedules",
+            {
+              db: store.state.database,
+              userId: _user.uid,
+            }
+          );
+          schedules.value = userSchedules;
+          isAnonymous.value = _user.isAnonymous;
+          isLoading.value = false;
+        }
       });
     });
 
