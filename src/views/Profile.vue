@@ -10,28 +10,7 @@
             <h1>{{ user.displayName }}</h1>
           </IonCardTitle>
         </IonCardHeader>
-        <IonCardContent v-if="!isLoading">
-          <template v-if="schedules.length < 1">
-            Vous n'avez pas d'indisponibilités de renseignées</template
-          >
-          <div v-else class="schedule-display">
-            <IonLabel>
-              <h2>Indisponibilité{{ schedules.length > 1 ? "s" : "" }}:</h2>
-            </IonLabel>
-            <ScheduleDisplay
-              v-for="(s, idx) in schedules"
-              :key="'schedule-' + idx"
-              :data="s"
-            />
-          </div>
-        </IonCardContent>
-        <IonCardContent v-else>
-          <IonCardContent>
-            <IonSpinner name="crescent" />
-          </IonCardContent>
-        </IonCardContent>
       </IonCard>
-
       <!-- ANONYMOUS -->
       <IonCard v-else-if="isAnonymous">
         <IonCardTitle>
@@ -47,7 +26,7 @@
       </IonCard>
       <!-- if shop only -->
       <IonCard v-if="!isAnonymous" class="full">
-        <template v-if="user">
+        <template v-if="user && !isLoading">
           <IonItem>
             <IonLabel> Je suis un commercial</IonLabel>
             <IonToggle :checked="user.isShop" @ionChange="toggleIsShop" />
@@ -86,7 +65,6 @@ import { ref, Ref } from "@vue/reactivity";
 import { onMounted } from "@vue/runtime-core";
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
 import { Schedule as MSchedule } from "@/models";
-import ScheduleDisplay from "@/components/ScheduleDisplay.vue";
 import Schedule from "@/components/Schedule.vue";
 import Toolbar from "@/components/Toolbar.vue";
 
@@ -100,7 +78,6 @@ export default {
     IonCardHeader,
     IonCardTitle,
     IonSpinner,
-    ScheduleDisplay,
     IonLabel,
     IonItem,
     IonToggle,

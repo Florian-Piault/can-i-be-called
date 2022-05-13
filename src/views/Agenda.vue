@@ -4,18 +4,12 @@
 
     <ion-content :fullscreen="true" v-if="shops.length > 0">
       <!-- SLIDES -->
-
       <ion-slides scrollbar="false" pager="true" :options="slideOpts">
         <ion-slide v-for="shop in shops" :key="shop">
           <ion-card class="card" @click.prevent="handleModal(shop)">
             <img class="bg" :src="shop.img" />
             <ion-card-content class="card-content">
               <ion-card-title> {{ shop.displayName }} </ion-card-title>
-              <p v-if="shop.schedules">
-                a <b>{{ shop.schedules.length }}</b> indisponibilité{{
-                  shop.schedules.length > 1 ? "s" : ""
-                }}
-              </p>
             </ion-card-content>
           </ion-card>
         </ion-slide>
@@ -133,9 +127,7 @@ export default defineComponent({
       if (route.name === "agenda") await initShops();
     });
 
-    onMounted(async () => {
-      await initShops();
-    });
+    onMounted(async () => await initShops());
 
     return {
       currentShop,

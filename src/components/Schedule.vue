@@ -5,113 +5,145 @@
     </ion-toolbar>
   </ion-header>
   <ion-content class="ion-padding content-column">
-    <div class="calendar-wrapper">
-      <div v-if="shopId === currentUserId" class="datepicker-wrapper">
-        <!--  MODE SELECTION -->
-        <IonItem>
-          <IonSelect
-            interface="popover"
-            v-model="mode.id"
-            @ionChange="modeChanged"
-          >
-            <IonSelectOption v-for="m in modes" :key="m.id" :value="m.id">{{
-              m.name
-            }}</IonSelectOption>
-          </IonSelect>
-        </IonItem>
-        <!-- MODE ONE DAY : DATETIME -->
-        <template v-if="mode.id === 'ONE_DAY'">
-          <template v-if="step === 0">
-            <DatePicker
-              disabled
-              mode="date"
-              v-model="date"
-              :model-config="modelConfig"
-            />
-          </template>
-          <template v-if="step === 1">
-            <DatePicker
-              mode="time"
-              v-model="hours.start"
-              :model-config="modelConfig"
-              is24hr
-            />
-          </template>
-          <template v-if="step === 2">
-            <DatePicker
-              mode="time"
-              v-model="hours.end"
-              :model-config="modelConfig"
-              is24hr
-            />
-          </template>
-          <div class="btn-side-by-side">
-            <ion-button
-              @click="addDate($event, true)"
-              expand="block"
-              :disabled="step === 0"
-            >
-              <ion-icon :icon="arrowBackCircleOutline" />
-              <ion-label>Retour</ion-label>
-            </ion-button>
-            <ion-button @click="addDate" expand="block">
-              <ion-label>Suivant</ion-label>
-              <ion-icon :icon="arrowForwardCircleOutline" />
-            </ion-button>
-          </div>
-        </template>
-        <!-- MODE RANGE : 2 DATES -->
-        <template v-else-if="mode.id === 'RANGE'">
+    <div class="datepicker-wrapper">
+      <!--  MODE SELECTION -->
+      <IonItem v-if="canEdit">
+        <IonSelect
+          interface="popover"
+          v-model="mode.id"
+          @ionChange="modeChanged"
+        >
+          <IonSelectOption v-for="m in modes" :key="m.id" :value="m.id">{{
+            m.name
+          }}</IonSelectOption>
+        </IonSelect>
+      </IonItem>
+      <h2 v-else>Indisponibilités</h2>
+      <!-- MODE ONE DAY : DATETIME -->
+      <template v-if="mode.id === 'ONE_DAY'">
+        <template v-if="step === 0">
           <DatePicker
-            mode="range"
-            v-model="interval"
+            mode="date"
+            v-model="date"
+            is-expanded
             :model-config="modelConfig"
-            isRange
-          />
-          <ion-button @click="addInterval" expand="block">
-            <ion-icon :icon="addCircleOutline" />
-            <ion-label>Ajouter l'intervalle de date</ion-label>
-          </ion-button>
+            :is-dark="isDarkTheme"
+            :attributes="unavailability"
+          >
+            <!-- todo: component popover to delete a schedule -->
+            <template v-if="false" #day-popover> <div>eee</div> </template>
+          </DatePicker>
         </template>
+        <template v-if="step === 1">
+          <DatePicker
+            mode="time"
+            v-model="hours.start"
+            is-expanded
+            is24hr
+            :model-config="modelConfig"
+            :is-dark="isDarkTheme"
+            :attributes="unavailability"
+          />
+        </template>
+        <template v-if="step === 2">
+          <DatePicker
+            mode="time"
+            v-model="hours.end"
+            is-expanded
+            :model-config="modelConfig"
+            is24hr
+            :is-dark="isDarkTheme"
+            :attributes="unavailability"
+          />
+        </template>
+        <div class="btn-side-by-side" v-if="canEdit">
+          <ion-button
+            @click="addDate($event, true)"
+            expand="block"
+            color="primary"
+            fill="solid"
+            :disabled="step === 0"
+          >
+            <ion-icon :icon="arrowBackCircleOutline" />
+            <ion-label>Retour</ion-label>
+          </ion-button>
+          <ion-button
+            @click="addDate"
+            color="primary"
+            expand="block"
+            fill="solid"
+          >
+            <ion-label>Suivant</ion-label>
+            <ion-icon :icon="arrowForwardCircleOutline" />
+          </ion-button>
+        </div>
+      </template>
+      <!-- MODE RANGE : 2 DATES -->
+      <template v-else-if="mode.id === 'RANGE'">
+        <DatePicker
+          mode="range"
+          isRange
+          is-expanded
+          v-model="interval"
+          :model-config="modelConfig"
+          :is-dark="isDarkTheme"
+          :attributes="unavailability"
+        >
+          <template v-if="false" #day-popover="{ day }">
+            <div>
+              {{ day.date }}
+            </div>
+          </template>
+        </DatePicker>
+        <ion-button @click="addInterval" expand="block">
+          <ion-icon :icon="addCircleOutline" />
+          <ion-label>Ajouter l'intervalle de date</ion-label>
+        </ion-button>
+      </template>
 
-        <!-- RESULTS DISPLAY -->
-        <ScheduleDisplaySteps
-          :modeId="mode.id"
-          :dDate="displayedDate"
-          :dHours="displayedHours"
-          :dInterval="displayedInterval"
-          :stepNum="step"
-        />
-      </div>
-
-      <div class="schedule-display" v-if="allSchedules.length > 0">
-        <IonLabel>
-          <h2>Indisponibilité{{ allSchedules.length > 1 ? "s" : "" }}:</h2>
-        </IonLabel>
-        <ScheduleDisplay
-          v-for="(s, idx) in allSchedules"
-          :key="'schedule-' + idx"
-          :data="s"
-        />
-      </div>
+      <!-- RESULTS DISPLAY -->
+      <ScheduleDisplaySteps
+        v-if="
+          (date && mode.id === 'ONE_DAY') ||
+          (interval.start && mode.id === 'RANGE')
+        "
+        :modeId="mode.id"
+        :dDate="displayedDate"
+        :dHours="displayedHours"
+        :dInterval="displayedInterval"
+        :stepNum="step"
+      />
     </div>
-    <!-- steps actions -->
-    <ion-buttons class="btn-side-by-side">
-      <ion-button v-if="!notModal" @click="close('cancel')" color="danger">
-        <ion-icon :icon="closeCircleOutline" />
-        <ion-label v-if="shopId === currentUserId">Annuler</ion-label>
-        <ion-label v-else>Fermer</ion-label>
-      </ion-button>
+    <!-- IN PROFILE -->
+    <ion-buttons class="btn-side-by-side" v-if="notModal">
       <ion-button
         v-if="shopId === currentUserId"
         @click="close('save')"
         color="success"
+        :disabled="changes < 1"
       >
         <ion-icon :icon="checkmarkCircleOutline" />
         <ion-label>Valider</ion-label>
       </ion-button>
     </ion-buttons>
   </ion-content>
+  <!-- IN MODAL -->
+  <ion-buttons class="btn-side-by-side" v-if="!notModal">
+    <ion-button @click="close('cancel')" color="danger">
+      <ion-icon :icon="closeCircleOutline" />
+      <ion-label v-if="shopId === currentUserId">Annuler</ion-label>
+      <ion-label v-else>Fermer</ion-label>
+    </ion-button>
+    <ion-button
+      v-if="shopId === currentUserId"
+      @click="close('save')"
+      color="success"
+      :disabled="changes < 1"
+    >
+      <ion-icon :icon="checkmarkCircleOutline" />
+      <ion-label>Valider</ion-label>
+    </ion-button>
+  </ion-buttons>
 </template>
 
 <script lang="ts">
@@ -145,6 +177,7 @@ import { defineComponent, Ref } from "vue";
 import ScheduleDisplaySteps from "./ScheduleDisplaySteps.vue";
 import ScheduleDisplay from "./ScheduleDisplay.vue";
 import { Schedule, Mode } from "@/models/index";
+import { useCalendarMethods } from "@/composition/useCalendarMethods";
 export default defineComponent({
   name: "Schedule",
   props: ["schedule", "title", "currentUserId", "shopId", "notModal"],
@@ -163,7 +196,7 @@ export default defineComponent({
     IonSelectOption,
     DatePicker,
     ScheduleDisplaySteps,
-    ScheduleDisplay,
+    // ScheduleDisplay,
   },
   setup(props, { emit }) {
     // --- props
@@ -175,6 +208,7 @@ export default defineComponent({
     };
 
     // --- data
+    const canEdit = computed(() => props.currentUserId === props.shopId);
     const tmpSchedule: Ref<Schedule[]> = ref([]);
     const allSchedules: Ref<Schedule[]> = ref([]);
     allSchedules.value.push(...actualSchedule.value);
@@ -206,7 +240,7 @@ export default defineComponent({
       },
     ];
     const repeat = null;
-    const date: Ref<Date> = ref(new Date());
+    const date: Ref<Date> = ref(null);
     const hours: Ref<{ start: Date; end: Date }> = ref({
       start: new Date(Date.now()),
       end: new Date(Date.now()),
@@ -245,7 +279,9 @@ export default defineComponent({
               db: store.state.database,
               schedules: tmpSchedule.value,
             })
-            .then(() => emit("addschedules", props.shopId));
+            .then(() => {
+              emit("addschedules", props.shopId);
+            });
         }
         modalController.dismiss(tmpSchedule.value);
       } catch (e) {
@@ -254,7 +290,7 @@ export default defineComponent({
         //--- resets data
         interval.value = { start: null, end: null };
         step.value = 0;
-        date.value = new Date();
+        date.value = null;
         tmpSchedule.value = [];
       }
     };
@@ -367,7 +403,10 @@ export default defineComponent({
       };
     });
 
+    const { isDarkTheme, unavailability } = useCalendarMethods(allSchedules);
+
     return {
+      canEdit,
       step,
       mode,
       modes,
@@ -379,7 +418,10 @@ export default defineComponent({
       actualSchedule,
       tmpSchedule,
       allSchedules,
+      unavailability,
       modelConfig,
+      isDarkTheme,
+      changes,
       close,
       addDate,
       addInterval,
@@ -399,12 +441,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.calendar-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .datepicker-wrapper {
   display: flex;
   flex-direction: column;
