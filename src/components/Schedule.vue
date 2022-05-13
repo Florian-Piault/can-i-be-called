@@ -95,32 +95,26 @@
         />
       </div>
     </div>
+    <!-- steps actions -->
+    <ion-buttons class="btn-side-by-side">
+      <ion-button v-if="!notModal" @click="close('cancel')" color="danger">
+        <ion-icon :icon="closeCircleOutline" />
+        <ion-label v-if="shopId === currentUserId">Annuler</ion-label>
+        <ion-label v-else>Fermer</ion-label>
+      </ion-button>
+      <ion-button
+        v-if="shopId === currentUserId"
+        @click="close('save')"
+        color="success"
+      >
+        <ion-icon :icon="checkmarkCircleOutline" />
+        <ion-label>Valider</ion-label>
+      </ion-button>
+    </ion-buttons>
   </ion-content>
-
-  <!-- steps actions -->
-  <ion-buttons class="btn-side-by-side">
-    <ion-button @click="close('cancel')" color="danger">
-      <ion-icon :icon="closeCircleOutline" />
-      <ion-label v-if="shopId === currentUserId">Annuler</ion-label>
-      <ion-label v-else>Fermer</ion-label>
-    </ion-button>
-    <ion-button
-      v-if="shopId === currentUserId"
-      @click="close('save')"
-      color="success"
-    >
-      <ion-icon :icon="checkmarkCircleOutline" />
-      <ion-label>Valider</ion-label>
-    </ion-button>
-  </ion-buttons>
 </template>
 
 <script lang="ts">
-// todo -> feedback schedule added (toast?)
-// todo -> calendar : see directly schedules
-// todo -> profile page
-// todo -> login : mail+password
-
 import {
   closeCircleOutline,
   addCircleOutline,
@@ -145,6 +139,7 @@ import {
   modalController,
 } from "@ionic/vue";
 import { computed, ref, toRefs } from "@vue/reactivity";
+import store from "@/store";
 import { useGlobalMethods } from "@/composition/useGlobalMethods";
 import { defineComponent, Ref } from "vue";
 import ScheduleDisplaySteps from "./ScheduleDisplaySteps.vue";
@@ -153,6 +148,7 @@ import { Schedule, Mode } from "@/models/index";
 export default defineComponent({
   name: "Schedule",
   props: ["schedule", "title", "currentUserId", "shopId", "notModal"],
+  emits: ["addschedules"],
   components: {
     IonContent,
     IonHeader,
@@ -169,10 +165,13 @@ export default defineComponent({
     ScheduleDisplaySteps,
     ScheduleDisplay,
   },
-  setup(props) {
+  setup(props, { emit }) {
     // --- props
-    const { schedule: actualSchedule } = toRefs(props) as {
+    const { schedule: actualSchedule, notModal: notOverlay } = toRefs(
+      props
+    ) as {
       schedule: Ref<Schedule[]>;
+      notModal: Ref<boolean>;
     };
 
     // --- data
@@ -232,12 +231,23 @@ export default defineComponent({
      *
      * @param mode {string} "save" | "cancel"
      */
-    const close = (mode: "save" | "cancel") => {
+    const close = async (mode: "save" | "cancel") => {
       try {
         if (mode === "save" && changes.value < 1)
           return setToast({ message: "Veuillez choisir un horaire" });
-        if (mode === "cancel") modalController.dismiss();
-        else modalController.dismiss(tmpSchedule.value);
+        if (mode === "cancel") return modalController.dismiss();
+
+        // Saving
+        if (notOverlay.value) {
+          await store
+            .dispatch("addSchedule", {
+              userId: props.currentUserId,
+              db: store.state.database,
+              schedules: tmpSchedule.value,
+            })
+            .then(() => emit("addschedules", props.shopId));
+        }
+        modalController.dismiss(tmpSchedule.value);
       } catch (e) {
         console.error(e);
       } finally {

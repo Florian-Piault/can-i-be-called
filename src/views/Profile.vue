@@ -55,16 +55,23 @@
           <IonSpinner name="crescent" />
         </IonCardContent>
       </IonCard>
+      <!-- if shop only -->
       <IonCard v-if="!isAnonymous" class="full">
-        <i>Work In Progress...</i>
-        <Schedule
-          v-if="user && user.isShop && schedules"
-          :schedule="schedules"
-          title="Ajouter une indisponibilité"
-          :currentUserId="user.uid"
-          :shopId="user.uid"
-          :notModal="true"
-        ></Schedule>
+        <template v-if="user">
+          <IonItem>
+            <IonLabel> Je suis un commercial</IonLabel>
+            <IonToggle :checked="user.isShop" @ionChange="toggleIsShop" />
+          </IonItem>
+          <Schedule
+            v-if="user.isShop"
+            :schedule="schedules"
+            title="Ajouter une indisponibilité"
+            :currentUserId="user.uid"
+            :shopId="user.uid"
+            :notModal="true"
+            @addschedules="addSchedules"
+          ></Schedule>
+        </template>
         <IonSpinner v-else name="crescent" />
       </IonCard>
     </ion-content>
@@ -83,6 +90,8 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonSpinner,
+  IonItem,
+  IonToggle,
   IonLabel,
 } from "@ionic/vue";
 import store from "@/store";
@@ -108,6 +117,8 @@ export default {
     IonSpinner,
     ScheduleDisplay,
     IonLabel,
+    IonItem,
+    IonToggle,
     Schedule,
   },
   setup() {
@@ -116,6 +127,36 @@ export default {
     const isAnonymous = ref(false);
     const schedules: Ref<MSchedule[]> = ref([]);
     const isLoading = ref(true);
+
+    const addSchedules = (userId: string) => {
+      isLoading.value = true;
+      schedules.value = [];
+      onAuthStateChanged(getAuth(), async _user => {
+        const userSchedules: MSchedule[] = await store.dispatch(
+          "getUserSchedules",
+          {
+            db: store.state.database,
+            userId: userId,
+          }
+        );
+        schedules.value = userSchedules;
+        isAnonymous.value = _user.isAnonymous;
+        isLoading.value = false;
+      });
+    };
+
+    const toggleIsShop = async () => {
+      await store.dispatch("updateUserIsShop", {
+        db: store.state.database,
+        userId: user.value.uid,
+        isShop: !user.value.isShop,
+      });
+
+      user.value = await store.dispatch("getUser", {
+        db: store.state.database,
+        id: user.value.uid,
+      });
+    };
 
     onMounted(() => {
       onAuthStateChanged(getAuth(), async _user => {
@@ -138,7 +179,15 @@ export default {
       });
     });
 
-    return { user, profilePics, isAnonymous, schedules, isLoading };
+    return {
+      user,
+      profilePics,
+      isAnonymous,
+      schedules,
+      isLoading,
+      addSchedules,
+      toggleIsShop,
+    };
   },
 };
 </script>

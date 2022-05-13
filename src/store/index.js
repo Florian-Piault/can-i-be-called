@@ -121,6 +121,11 @@ const store = createStore({
       users.forEach(user => _users.push(user.data()));
       return _users[0];
     },
+    async updateUserIsShop({ commit }, { db, userId, isShop }) {
+      const userDoc = doc(db, "user", userId);
+      const userUpdated = await updateDoc(userDoc, { isShop });
+      return userUpdated;
+    },
     async updateUserSchedule({ commit }, { db, userId, schedule }) {
       const userDoc = doc(db, "user", userId);
       await updateDoc(userDoc, { schedules: arrayUnion(schedule) });

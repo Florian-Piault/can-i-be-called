@@ -10,7 +10,6 @@
     <ion-content :fullscreen="true" v-if="shops.length > 0">
       <!-- SLIDES -->
 
-      <div class="card-category">Category One</div>
       <ion-slides scrollbar="false" pager="true" :options="slideOpts">
         <ion-slide v-for="shop in shops" :key="shop">
           <ion-card class="card" @click.prevent="handleModal(shop)">
@@ -56,6 +55,7 @@ import {
   Ref,
   ref,
 } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import store from "@/store";
 import { Schedule, Shop } from "@/models/index";
 
@@ -115,14 +115,14 @@ export default defineComponent({
           db: store.state.database,
           schedules: data,
         });
-        console.log(newSchedules);
         shops.value.find(s => s.uid === currentShop.value.uid).schedules =
           newSchedules.find(s => s.uid === currentShop.value.uid).schedules;
       }
       currentShop.value = null;
     };
 
-    onMounted(async () => {
+    const initShops = async () => {
+      shops.value = [];
       const _shops = await store.dispatch("getSchedules", {
         db: store.state.database,
       });
@@ -134,6 +134,16 @@ export default defineComponent({
           img: "./assets/0" + Math.ceil(Math.random() * (4 - 1) + 1) + ".jpg",
         });
       });
+    };
+
+    const router = useRouter();
+    const route = useRoute();
+    router.afterEach(async () => {
+      if (route.name === "agenda") await initShops();
+    });
+
+    onMounted(async () => {
+      await initShops();
     });
 
     return {
