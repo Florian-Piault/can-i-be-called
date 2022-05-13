@@ -1,11 +1,8 @@
 <template>
   <ion-page>
     <!-- HEADER -->
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Can I Be Called</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <Toolbar title="Can I be called" />
+
     <ion-content>
       <ion-card class="wrapper">
         <!-- login -->
@@ -140,8 +137,6 @@
 import {
   IonPage,
   IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonCard,
   IonCardTitle,
@@ -167,14 +162,12 @@ import {
   eyeOffOutline as eyeOff,
   logoGoogle,
 } from "ionicons/icons";
+import Toolbar from "@/components/Toolbar.vue";
 
 export default {
   name: "Login",
   components: {
     IonPage,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonCard,
     IonCardTitle,
@@ -188,6 +181,7 @@ export default {
     IonGrid,
     IonRow,
     IonItemDivider,
+    Toolbar,
   },
   setup() {
     const store = useStore();

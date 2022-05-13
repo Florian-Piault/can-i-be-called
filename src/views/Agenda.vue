@@ -1,11 +1,6 @@
 <template v-if="user">
   <ion-page>
-    <!-- HEADER -->
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Agendas</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <Toolbar title="Agenda" />
 
     <ion-content :fullscreen="true" v-if="shops.length > 0">
       <!-- SLIDES -->
@@ -36,9 +31,6 @@
 <script lang="ts">
 import {
   IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonCard,
   IonCardTitle,
@@ -58,6 +50,7 @@ import {
 import { useRouter, useRoute } from "vue-router";
 import store from "@/store";
 import { Schedule, Shop } from "@/models/index";
+import Toolbar from "@/components/Toolbar.vue";
 
 export default defineComponent({
   name: "Agenda",
@@ -65,14 +58,12 @@ export default defineComponent({
     IonSlide,
     IonSlides,
     IonSpinner,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonPage,
     IonCard,
     IonCardTitle,
     IonCardContent,
+    Toolbar,
   },
   setup() {
     const currentShop: Ref<Shop> = ref(null);

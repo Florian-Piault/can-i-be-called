@@ -1,10 +1,6 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Paramètres</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <Toolbar title="Paramètres" />
     <ion-content>
       <ion-item button @click="logOut" lines="full" color="danger">
         <ion-label> Se déconnecter </ion-label>
@@ -14,33 +10,24 @@
   </ion-page>
 </template>
 
-<script>
+<script lang="ts">
 import { closeCircle } from "ionicons/icons";
-import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonLabel,
-  IonContent,
-  IonItem,
-  IonIcon,
-} from "@ionic/vue";
+import { IonPage, IonLabel, IonContent, IonItem, IonIcon } from "@ionic/vue";
 import { useLogoutMethods } from "@/composition/useLogoutMethods";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import { defineComponent } from "vue";
+import Toolbar from "@/components/Toolbar.vue";
 
-export default {
+export default defineComponent({
   name: "Parameters",
   components: {
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonPage,
     IonLabel,
     IonIcon,
     IonItem,
+    Toolbar,
   },
   setup() {
     const store = useStore();
@@ -50,5 +37,5 @@ export default {
 
     return { logOut, decoIcon };
   },
-};
+});
 </script>

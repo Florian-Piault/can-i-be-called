@@ -1,17 +1,7 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Profil</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <Toolbar title="Profil" />
     <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Profil</ion-title>
-        </ion-toolbar>
-      </ion-header>
-
       <!-- USER -->
       <IonCard v-if="user">
         <IonCardHeader class="profile-header">
@@ -81,9 +71,6 @@
 <script lang="ts">
 import {
   IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonCard,
   IonCardContent,
@@ -95,19 +82,17 @@ import {
   IonLabel,
 } from "@ionic/vue";
 import store from "@/store";
-import { computed, ref, Ref } from "@vue/reactivity";
+import { ref, Ref } from "@vue/reactivity";
 import { onMounted } from "@vue/runtime-core";
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
 import { Schedule as MSchedule } from "@/models";
 import ScheduleDisplay from "@/components/ScheduleDisplay.vue";
 import Schedule from "@/components/Schedule.vue";
+import Toolbar from "@/components/Toolbar.vue";
 
 export default {
   name: "Profile",
   components: {
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonPage,
     IonCard,
@@ -120,6 +105,7 @@ export default {
     IonItem,
     IonToggle,
     Schedule,
+    Toolbar,
   },
   setup() {
     const user = ref(null);
