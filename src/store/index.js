@@ -1,24 +1,28 @@
 import { createStore } from "vuex";
 import {
   collection,
-  getDocs,
   doc,
+  getDocs,
   getDoc,
-  where,
-  query,
   setDoc,
-  Timestamp,
   addDoc,
   updateDoc,
+  deleteDoc,
+  where,
+  query,
+  Timestamp,
   arrayUnion,
+  arrayRemove,
+  FieldValue,
 } from "firebase/firestore/lite";
 import { getStorage, listAll, ref, getDownloadURL } from "firebase/storage";
 
 async function formatResponse(shop) {
   const fs = [];
-  const p = await shop.schedules.reduce(async (promise, scheduleRef) => {
+  await shop.schedules.reduce(async (promise, scheduleRef) => {
     const schedule = await getDoc(scheduleRef);
     const data = schedule.data();
+    data.id = schedule.id;
     // formats : Firestore.Timestamp -> Date
     let d = null;
     if (data.date) {
@@ -61,7 +65,6 @@ const store = createStore({
   }),
   mutations: {
     /**
-     *
      * @param {*} state the instance of the state
      * @param {*} log the instance if the user
      */
@@ -163,6 +166,16 @@ const store = createStore({
 
       return allSchedules;
     },
+    async deleteSchedule({ commit }, { db, userId, scheduleId }) {
+      const userRef = doc(db, "user", userId);
+      const scheduleRef = doc(db, "schedule", scheduleId);
+      const userScheduleDeleted = await updateDoc(userRef, {
+        schedules: arrayRemove(scheduleRef),
+      });
+      const scheduleDeleted = await deleteDoc(scheduleRef);
+      const finished = Promise.all(userScheduleDeleted, scheduleDeleted);
+      return finished;
+    },
     async getSchedules({ commit }, { db }) {
       const shopRef = query(
         collection(db, "user"),
@@ -213,53 +226,6 @@ const store = createStore({
 
         return { ..._shop, schedules: schedules };
       });
-      return _shops;
-    },
-    async getUserSchedulesDepecated({ commit }, { db, userId }) {
-      const shopRef = query(collection(db, "user"), where("uid", "==", userId));
-      const shops = await getDocs(shopRef);
-      const _shops = shops.docs.map(shop => {
-        const _shop = shop.data();
-        const schedules = [];
-        _shop.schedules.forEach(async scheduleRef => {
-          const schedule = await getDoc(scheduleRef);
-          const data = schedule.data();
-          // formats : Firestore.Timestamp -> Date
-          let d = null;
-          if (data.date) {
-            d = new Date(
-              data.date.seconds * 1000 + data.date.nanoseconds / 1000000
-            );
-            data.date = d;
-          }
-
-          let i = null;
-          if (data.interval) {
-            i = {
-              start: new Date(
-                data.interval.start.seconds * 1000 +
-                  data.interval.start.nanoseconds / 1000000
-              ),
-              end: new Date(
-                data.interval.end.seconds * 1000 +
-                  data.interval.end.nanoseconds / 1000000
-              ),
-            };
-            data.interval = i;
-          }
-          let h = null;
-          if (data.hours) {
-            h = data.hours.map(
-              h => new Date(h.seconds * 1000 + h.nanoseconds / 1000000)
-            );
-            data.hours = h;
-          }
-
-          schedules.push(data);
-        });
-        return schedules;
-      });
-
       return _shops;
     },
     async getUserSchedules({ commit }, { db, userId }) {

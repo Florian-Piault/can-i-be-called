@@ -15,15 +15,18 @@ export function useCalendarMethods(schedules = null) {
   //#region Preloaded Schedules
   const setOneDay = (schedule: Schedule) => {
     return {
+      key: schedule.id,
       highlight: "red",
       dates: schedule.date,
       popover: {
         visibility: "hover",
+        hideIndicator: true,
       },
     };
   };
   const setRange = (schedule: Schedule) => {
     return {
+      key: schedule.id,
       highlight: {
         start: { fillMode: "outline", color: "red" },
         base: { fillMode: "light", color: "red" },
@@ -35,6 +38,7 @@ export function useCalendarMethods(schedules = null) {
       },
       popover: {
         visibility: "hover",
+        hideIndicator: true,
       },
     };
   };

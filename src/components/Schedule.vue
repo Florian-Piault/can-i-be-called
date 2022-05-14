@@ -30,8 +30,22 @@
             :is-dark="isDarkTheme"
             :attributes="unavailability"
           >
-            <!-- todo: component popover to delete a schedule -->
-            <template v-if="false" #day-popover> <div>eee</div> </template>
+            <template
+              v-if="canEdit"
+              #day-popover="{ day, masks, format, attributes }"
+            >
+              <span class="popover">
+                <IonButton
+                  @click="deleteDate(attributes)"
+                  size="small"
+                  color="danger"
+                  fill="solid"
+                >
+                  <IonIcon :icon="trashOutline"></IonIcon>
+                </IonButton>
+                {{ format(day.date, masks.dayPopover) }} <br />
+              </span>
+            </template>
           </DatePicker>
         </template>
         <template v-if="step === 1">
@@ -89,10 +103,21 @@
           :is-dark="isDarkTheme"
           :attributes="unavailability"
         >
-          <template v-if="false" #day-popover="{ day }">
-            <div>
-              {{ day.date }}
-            </div>
+          <template
+            v-if="canEdit"
+            #day-popover="{ day, format, masks, attributes }"
+          >
+            <span class="popover">
+              <IonButton
+                @click="deleteDate(attributes)"
+                size="small"
+                color="danger"
+                fill="solid"
+              >
+                <IonIcon :icon="trashOutline"></IonIcon>
+              </IonButton>
+              {{ format(day.date, masks.dayPopover) }} <br />
+            </span>
           </template>
         </DatePicker>
         <ion-button @click="addInterval" expand="block">
@@ -153,6 +178,7 @@ import {
   checkmarkCircleOutline,
   arrowForwardCircleOutline,
   arrowBackCircleOutline,
+  trashOutline,
 } from "ionicons/icons";
 import { Temporal } from "@js-temporal/polyfill";
 import { DatePicker } from "v-calendar";
@@ -175,7 +201,6 @@ import store from "@/store";
 import { useGlobalMethods } from "@/composition/useGlobalMethods";
 import { defineComponent, Ref } from "vue";
 import ScheduleDisplaySteps from "./ScheduleDisplaySteps.vue";
-import ScheduleDisplay from "./ScheduleDisplay.vue";
 import { Schedule, Mode } from "@/models/index";
 import { useCalendarMethods } from "@/composition/useCalendarMethods";
 export default defineComponent({
@@ -196,7 +221,6 @@ export default defineComponent({
     IonSelectOption,
     DatePicker,
     ScheduleDisplaySteps,
-    // ScheduleDisplay,
   },
   setup(props, { emit }) {
     // --- props
@@ -270,10 +294,9 @@ export default defineComponent({
         if (mode === "save" && changes.value < 1)
           return setToast({ message: "Veuillez choisir un horaire" });
         if (mode === "cancel") return modalController.dismiss();
-
         // Saving
         if (notOverlay.value) {
-          await store
+          return await store
             .dispatch("addSchedule", {
               userId: props.currentUserId,
               db: store.state.database,
@@ -293,6 +316,15 @@ export default defineComponent({
         date.value = null;
         tmpSchedule.value = [];
       }
+    };
+
+    const deleteDate = async (attributes: object) => {
+      const key: string = attributes[0]["key"];
+      await store.dispatch("deleteSchedule", {
+        db: store.state.database,
+        userId: props.currentUserId,
+        scheduleId: key,
+      });
     };
 
     const addDate = (event: Event, prev: boolean) => {
@@ -423,6 +455,7 @@ export default defineComponent({
       isDarkTheme,
       changes,
       close,
+      deleteDate,
       addDate,
       addInterval,
       modeChanged,
@@ -435,6 +468,7 @@ export default defineComponent({
       checkmarkCircleOutline,
       arrowForwardCircleOutline,
       arrowBackCircleOutline,
+      trashOutline,
     };
   },
 });
@@ -457,5 +491,11 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.popover {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 </style>

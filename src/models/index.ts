@@ -3,6 +3,8 @@ import { Ref } from "vue";
 /**
  * Schedule attached to a user
  *
+ * **id** firebase document id
+ *
  * if mode is **ONE_DAY** : date & hours
  *
  * if mode is **RANGE** : interval
@@ -10,6 +12,7 @@ import { Ref } from "vue";
  * @beta repeat is not used yet
  */
 export interface Schedule {
+  id?: string;
   mode: string;
   date?: Date;
   interval?: { start: Date; end: Date };
