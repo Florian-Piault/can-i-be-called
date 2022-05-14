@@ -169,12 +169,11 @@ const store = createStore({
     async deleteSchedule({ commit }, { db, userId, scheduleId }) {
       const userRef = doc(db, "user", userId);
       const scheduleRef = doc(db, "schedule", scheduleId);
-      const userScheduleDeleted = await updateDoc(userRef, {
+      await updateDoc(userRef, {
         schedules: arrayRemove(scheduleRef),
       });
-      const scheduleDeleted = await deleteDoc(scheduleRef);
-      const finished = Promise.all(userScheduleDeleted, scheduleDeleted);
-      return finished;
+      await deleteDoc(scheduleRef);
+      return "ok";
     },
     async getSchedules({ commit }, { db }) {
       const shopRef = query(
