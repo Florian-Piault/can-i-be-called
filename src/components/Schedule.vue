@@ -104,7 +104,7 @@
       <!-- RESULTS DISPLAY -->
       <ScheduleDisplaySteps
         v-if="
-          (date && mode.id === 'ONE_DAY') ||
+          (canEdit && date && mode.id === 'ONE_DAY') ||
           (interval.start && mode.id === 'RANGE')
         "
         :modeId="mode.id"
@@ -348,7 +348,7 @@ export default defineComponent({
       if (!date.value) return;
       return Temporal.PlainDate.from({
         year: date.value.getFullYear(),
-        month: date.value.getMonth(),
+        month: date.value.getUTCMonth() + 1,
         day: date.value.getDate(),
       });
     });
@@ -375,7 +375,7 @@ export default defineComponent({
         return { start: null, end: null };
       const intervalStart = Temporal.PlainDate.from({
         year: interval.value.start.getFullYear(),
-        month: interval.value.start.getUTCMonth(),
+        month: interval.value.start.getUTCMonth() + 1,
         day: interval.value.start.getUTCDate(),
       });
 
@@ -383,7 +383,7 @@ export default defineComponent({
       if (interval.value) {
         intervalEnd = Temporal.PlainDate.from({
           year: interval.value.end.getFullYear(),
-          month: interval.value.end.getUTCMonth(),
+          month: interval.value.end.getUTCMonth() + 1,
           day: interval.value.end.getUTCDate(),
         });
       }

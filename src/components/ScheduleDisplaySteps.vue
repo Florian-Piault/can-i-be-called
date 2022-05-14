@@ -2,34 +2,29 @@
   <IonItem>
     <div v-if="mode === 'ONE_DAY' && dates">
       <div :class="step === 0 ? 'selected' : ''">
-        {{ dates.toLocaleString() }}
+        {{ displayedDate }}
       </div>
-      <div>
+      <div class="centered">
         <span :class="step === 1 ? 'selected' : ''">
-          {{ hours.start.toLocaleString() }} &rarr;
+          {{ hours.start }} &rarr;
         </span>
         <span :class="step === 2 ? 'selected' : ''">
-          {{ hours.end.toLocaleString() }}
+          {{ hours.end }}
         </span>
       </div>
     </div>
     <div v-else-if="mode === 'RANGE' && interval">
       <span>
-        <time>{{
-          interval.start ? interval.start.toLocaleString() : "..."
-        }}</time></span
-      ><br />
-      <span>
-        <time>{{
-          interval.end ? interval.end.toLocaleString() : "..."
-        }}</time></span
-      >
+        <time>{{ displayedInterval.start }}</time>
+        &rarr;
+        <time>{{ displayedInterval.end }}</time>
+      </span>
     </div>
   </IonItem>
 </template>
 
 <script lang="ts">
-import { defineComponent, toRefs } from "vue";
+import { computed, defineComponent, toRefs } from "vue";
 import { IonItem } from "@ionic/vue";
 export default defineComponent({
   name: "DisplayeScheduleSteps",
@@ -46,11 +41,40 @@ export default defineComponent({
       dInterval: interval,
     } = toRefs(props);
 
+    // FORMAT
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    const displayedDate = computed(() => {
+      return dates.value.toLocaleString([], {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    });
+
+    const displayedInterval = computed(() => {
+      return {
+        start: interval.value.start
+          ? interval.value.start.toLocaleString([], options)
+          : "...",
+        end: interval.value.end
+          ? interval.value.end.toLocaleString([], options)
+          : "...",
+      };
+    });
+
     return {
       mode,
       dates,
+      displayedDate,
       hours,
       interval,
+      displayedInterval,
       step,
     };
   },
@@ -61,5 +85,8 @@ export default defineComponent({
 .selected {
   font-weight: bold;
   font-size: 1.15em;
+}
+.centered {
+  text-align: center;
 }
 </style>
