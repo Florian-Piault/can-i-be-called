@@ -32,8 +32,9 @@
           >
             <template
               v-if="canEdit"
-              #day-popover="{ day, masks, format, attributes }"
+              #day-popover="{ day, masks, format, attributes, customData }"
             >
+              {{ customData }}
               <span class="popover">
                 <IonButton
                   @click="deleteDate(attributes)"
@@ -45,6 +46,11 @@
                 </IonButton>
                 {{ format(day.date, masks.dayPopover) }} <br />
               </span>
+              <p class="popover" v-if="attributes[0].customData">
+                <IonIcon :icon="timeOutline"></IonIcon>
+                {{ attributes[0].customData[0] }} &rarr;
+                {{ attributes[0].customData[1] }}
+              </p>
             </template>
           </DatePicker>
         </template>
@@ -118,6 +124,11 @@
               </IonButton>
               {{ format(day.date, masks.dayPopover) }} <br />
             </span>
+            <p class="popover" v-if="attributes[0].customData">
+              <IonIcon :icon="timeOutline"></IonIcon>
+              {{ attributes[0].customData[0] }} &rarr;
+              {{ attributes[0].customData[1] }}
+            </p>
           </template>
         </DatePicker>
         <ion-button @click="addInterval" expand="block">
@@ -179,6 +190,7 @@ import {
   arrowForwardCircleOutline,
   arrowBackCircleOutline,
   trashOutline,
+  timeOutline,
 } from "ionicons/icons";
 import { Temporal } from "@js-temporal/polyfill";
 import { DatePicker } from "v-calendar";
@@ -469,6 +481,7 @@ export default defineComponent({
       arrowForwardCircleOutline,
       arrowBackCircleOutline,
       trashOutline,
+      timeOutline,
     };
   },
 });

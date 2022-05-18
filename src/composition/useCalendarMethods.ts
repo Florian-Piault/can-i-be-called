@@ -22,6 +22,7 @@ export function useCalendarMethods(schedules = null) {
         visibility: "hover",
         hideIndicator: true,
       },
+      customData: schedule.hours.map(hour => hour.toLocaleTimeString()),
     };
   };
   const setRange = (schedule: Schedule) => {
