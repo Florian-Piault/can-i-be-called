@@ -181,9 +181,24 @@ const store = createStore({
       );
       const shops = await getDocs(shopRef);
 
+      const _shops = shops.docs.map(async shop => {
+        const _shop = shop.data();
+        const schedules = await formatResponse(_shop);
+        return { ..._shop, schedules };
+      });
+      return Promise.resolve(_shops);
+    },
+    async getSchedulesDeprecated({ commit }, { db }) {
+      const shopRef = query(
+        collection(db, "user"),
+        where("isShop", "==", true)
+      );
+      const shops = await getDocs(shopRef);
+
       const _shops = shops.docs.map(shop => {
         const _shop = shop.data();
         const schedules = [];
+
         _shop.schedules.forEach(async scheduleRef => {
           const schedule = await getDoc(scheduleRef);
           const data = schedule.data();

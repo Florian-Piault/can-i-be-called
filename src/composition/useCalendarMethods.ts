@@ -44,6 +44,14 @@ export function useCalendarMethods(schedules = null) {
     };
   };
 
+  const setToday = () => {
+    return {
+      key: "today",
+      dates: Date.now(),
+      bar: true,
+    };
+  };
+
   const initDatePicker = () => {
     if (!schedules.value) return [];
     const initState = [];
@@ -51,6 +59,7 @@ export function useCalendarMethods(schedules = null) {
       if (schedule.mode === "ONE_DAY") initState.push(setOneDay(schedule));
       else if (schedule.mode === "INTERVAL") initState.push(setRange(schedule));
     });
+    initState.push(setToday());
     return initState;
   };
   const unavailability = computed(() => initDatePicker());

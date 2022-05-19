@@ -28,6 +28,7 @@ export interface Shop {
   schedules: Ref<Schedule[]>;
   uid: Ref<string>;
   img: string;
+  isAvailable: Ref<boolean>;
 }
 
 export interface Mode {

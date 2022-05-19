@@ -10,6 +10,16 @@
             <img class="bg" :src="shop.img" />
             <ion-card-content class="card-content">
               <ion-card-title> {{ shop.displayName }} </ion-card-title>
+              <hr />
+              <p v-if="shop.isAvailable" class="isAvailable">
+                Actuellement disponible
+              </p>
+              <p v-else class="isNotAvailable">N'est pas disponible</p>
+              <p>
+                Il y a <b>{{ shop.schedules.length }}</b> indisponibilité{{
+                  shop.schedules.length > 1 ? "s" : ""
+                }}
+              </p>
             </ion-card-content>
           </ion-card>
         </ion-slide>
@@ -74,19 +84,38 @@ export default defineComponent({
     const shops: Ref<Array<Shop>> = ref([]);
     const user = computed(() => store.state.user);
 
+    const setIsAvailable = (schedules: Schedule[]) => {
+      if (!schedules || schedules.length === 0) return true;
+      const now = new Date();
+      const isAvailable = schedules.some(schedule => {
+        if (schedule.date) {
+          const start = new Date(schedule.hours[0]);
+          const end = new Date(schedule.hours[1]);
+          return now >= start && now <= end;
+        } else if (schedule.interval) {
+          const start = new Date(schedule.interval.start);
+          const end = new Date(schedule.interval.end);
+          return now >= start && now <= end;
+        }
+      });
+      return !isAvailable;
+    };
+
     const initShops = async () => {
       shops.value = [];
       const _shops = await store.dispatch("getSchedules", {
         db: store.state.database,
       });
-      _shops.forEach((shop: Shop) => {
+      const promiseShops = await Promise.all([..._shops]);
+      for (const shop of promiseShops) {
         shops.value.push({
-          schedules: ref(shop.schedules),
+          schedules: computed(() => shop.schedules),
           displayName: ref(shop.displayName),
           uid: ref(shop.uid),
           img: "./assets/0" + Math.ceil(Math.random() * (4 - 1) + 1) + ".jpg",
+          isAvailable: computed(() => setIsAvailable(shop.schedules)),
         });
-      });
+      }
     };
 
     const handleModal = async (shop: Shop) => {
@@ -169,5 +198,12 @@ export default defineComponent({
 .bg {
   width: 256px;
   height: 256px;
+}
+
+.isAvailable {
+  color: #00c853;
+}
+.isNotAvailable {
+  color: #ff3d00;
 }
 </style>
