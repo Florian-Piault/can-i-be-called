@@ -66,7 +66,6 @@ export default defineComponent({
       initialSlide: 0,
       speed: 400,
       loop: true,
-      effect: "flip",
       keyboard: {
         enabled: true,
         onlyInViewport: true,
@@ -74,6 +73,22 @@ export default defineComponent({
     });
     const shops: Ref<Array<Shop>> = ref([]);
     const user = computed(() => store.state.user);
+
+    const initShops = async () => {
+      shops.value = [];
+      const _shops = await store.dispatch("getSchedules", {
+        db: store.state.database,
+      });
+      _shops.forEach((shop: Shop) => {
+        shops.value.push({
+          schedules: ref(shop.schedules),
+          displayName: ref(shop.displayName),
+          uid: ref(shop.uid),
+          img: "./assets/0" + Math.ceil(Math.random() * (4 - 1) + 1) + ".jpg",
+        });
+      });
+    };
+
     const handleModal = async (shop: Shop) => {
       currentShop.value = shop;
       const modal = await modalController.create({
@@ -93,32 +108,19 @@ export default defineComponent({
       await modal.present();
 
       const { data } = await modal.onDidDismiss();
-      // push in database
       if (data) {
-        const newSchedules = await store.dispatch("addSchedule", {
-          userId: currentShop.value.uid,
-          db: store.state.database,
-          schedules: data,
-        });
-        shops.value.find(s => s.uid === currentShop.value.uid).schedules =
-          newSchedules.find(s => s.uid === currentShop.value.uid).schedules;
+        if (data.schedule) {
+          const newSchedules = await store.dispatch("addSchedule", {
+            userId: currentShop.value.uid,
+            db: store.state.database,
+            schedules: data.schedule,
+          });
+          shops.value.find(s => s.uid === currentShop.value.uid).schedules =
+            newSchedules.find(s => s.uid === currentShop.value.uid).schedules;
+        }
+        currentShop.value = null;
+        await initShops();
       }
-      currentShop.value = null;
-    };
-
-    const initShops = async () => {
-      shops.value = [];
-      const _shops = await store.dispatch("getSchedules", {
-        db: store.state.database,
-      });
-      _shops.forEach((shop: Shop) => {
-        shops.value.push({
-          schedules: ref(shop.schedules),
-          displayName: ref(shop.displayName),
-          uid: ref(shop.uid),
-          img: "./assets/0" + Math.ceil(Math.random() * (4 - 1) + 1) + ".jpg",
-        });
-      });
     };
 
     const router = useRouter();

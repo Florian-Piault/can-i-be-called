@@ -38,7 +38,8 @@
             :currentUserId="user.uid"
             :shopId="user.uid"
             :notModal="true"
-            @addschedules="addSchedules"
+            @addschedules="loadSchedules"
+            @deleteschedule="loadSchedules"
           ></Schedule>
         </template>
         <IonSpinner v-else name="crescent" />
@@ -91,21 +92,19 @@ export default {
     const schedules: Ref<MSchedule[]> = ref([]);
     const isLoading = ref(true);
 
-    const addSchedules = (userId: string) => {
+    const loadSchedules = async (userId: string) => {
       isLoading.value = true;
       schedules.value = [];
-      onAuthStateChanged(getAuth(), async _user => {
-        const userSchedules: MSchedule[] = await store.dispatch(
-          "getUserSchedules",
-          {
-            db: store.state.database,
-            userId: userId,
-          }
-        );
-        schedules.value = userSchedules;
-        isAnonymous.value = _user.isAnonymous;
-        isLoading.value = false;
-      });
+      const userSchedules: MSchedule[] = await store.dispatch(
+        "getUserSchedules",
+        {
+          db: store.state.database,
+          userId: userId,
+        }
+      );
+      schedules.value = userSchedules;
+      isLoading.value = false;
+      return userSchedules;
     };
 
     const toggleIsShop = async () => {
@@ -148,7 +147,7 @@ export default {
       isAnonymous,
       schedules,
       isLoading,
-      addSchedules,
+      loadSchedules,
       toggleIsShop,
     };
   },

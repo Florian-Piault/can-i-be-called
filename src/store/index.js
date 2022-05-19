@@ -172,8 +172,7 @@ const store = createStore({
       await updateDoc(userRef, {
         schedules: arrayRemove(scheduleRef),
       });
-      await deleteDoc(scheduleRef);
-      return "ok";
+      return await deleteDoc(scheduleRef);
     },
     async getSchedules({ commit }, { db }) {
       const shopRef = query(

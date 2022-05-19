@@ -46,7 +46,7 @@
                 </IonButton>
                 {{ format(day.date, masks.dayPopover) }} <br />
               </span>
-              <p class="popover" v-if="attributes[0].customData">
+              <p class="popover-hours" v-if="attributes[0].customData">
                 <IonIcon :icon="timeOutline"></IonIcon>
                 {{ attributes[0].customData[0] }} &rarr;
                 {{ attributes[0].customData[1] }}
@@ -124,7 +124,7 @@
               </IonButton>
               {{ format(day.date, masks.dayPopover) }} <br />
             </span>
-            <p class="popover" v-if="attributes[0].customData">
+            <p class="popover-hours" v-if="attributes[0].customData">
               <IonIcon :icon="timeOutline"></IonIcon>
               {{ attributes[0].customData[0] }} &rarr;
               {{ attributes[0].customData[1] }}
@@ -167,11 +167,11 @@
   <ion-buttons class="btn-side-by-side" v-if="!notModal">
     <ion-button @click="close('cancel')" color="danger">
       <ion-icon :icon="closeCircleOutline" />
-      <ion-label v-if="shopId === currentUserId">Annuler</ion-label>
+      <ion-label v-if="canEdit">Annuler</ion-label>
       <ion-label v-else>Fermer</ion-label>
     </ion-button>
     <ion-button
-      v-if="shopId === currentUserId"
+      v-if="canEdit"
       @click="close('save')"
       color="success"
       :disabled="changes < 1"
@@ -218,7 +218,7 @@ import { useCalendarMethods } from "@/composition/useCalendarMethods";
 export default defineComponent({
   name: "Schedule",
   props: ["schedule", "title", "currentUserId", "shopId", "notModal"],
-  emits: ["addschedules"],
+  emits: ["addschedules", "deleteschedule"],
   components: {
     IonContent,
     IonHeader,
@@ -244,7 +244,9 @@ export default defineComponent({
     };
 
     // --- data
-    const canEdit = computed(() => props.currentUserId === props.shopId);
+    const canEdit = computed(
+      () => props.currentUserId === props.shopId && notOverlay.value
+    );
     const tmpSchedule: Ref<Schedule[]> = ref([]);
     const allSchedules: Ref<Schedule[]> = ref([]);
     allSchedules.value.push(...actualSchedule.value);
@@ -278,8 +280,8 @@ export default defineComponent({
     const repeat = null;
     const date: Ref<Date> = ref(null);
     const hours: Ref<{ start: Date; end: Date }> = ref({
-      start: new Date(Date.now()),
-      end: new Date(Date.now()),
+      start: computed(() => (date.value ? date.value : new Date())),
+      end: computed(() => (date.value ? date.value : new Date())),
     });
     const interval: Ref<{ start: Date; end: Date }> = ref({
       start: null,
@@ -308,17 +310,13 @@ export default defineComponent({
         if (mode === "cancel") return modalController.dismiss();
         // Saving
         if (notOverlay.value) {
-          return await store
-            .dispatch("addSchedule", {
-              userId: props.currentUserId,
-              db: store.state.database,
-              schedules: tmpSchedule.value,
-            })
-            .then(() => {
-              emit("addschedules", props.shopId);
-            });
-        }
-        modalController.dismiss(tmpSchedule.value);
+          await store.dispatch("addSchedule", {
+            userId: props.currentUserId,
+            db: store.state.database,
+            schedules: tmpSchedule.value,
+          });
+          return emit("addschedules", props.shopId);
+        } else modalController.dismiss({ schedule: tmpSchedule.value });
       } catch (e) {
         console.error(e);
       } finally {
@@ -337,6 +335,8 @@ export default defineComponent({
         userId: props.currentUserId,
         scheduleId: key,
       });
+      if (notOverlay.value) emit("deleteschedule", props.shopId, key);
+      else modalController.dismiss({ shopId: props.shopId, scheduleId: key });
     };
 
     const addDate = (event: Event, prev: boolean) => {
@@ -510,5 +510,9 @@ export default defineComponent({
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.popover-text {
+  text-align: center;
 }
 </style>
