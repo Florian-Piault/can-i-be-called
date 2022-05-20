@@ -31,12 +31,12 @@
             :attributes="unavailability"
           >
             <template
-              v-if="canEdit"
               #day-popover="{ day, masks, format, attributes, customData }"
             >
               {{ customData }}
               <span class="popover">
                 <IonButton
+                  v-if="canEdit"
                   @click="deleteDate(attributes)"
                   size="small"
                   color="danger"
@@ -109,12 +109,10 @@
           :is-dark="isDarkTheme"
           :attributes="unavailability"
         >
-          <template
-            v-if="canEdit"
-            #day-popover="{ day, format, masks, attributes }"
-          >
+          <template #day-popover="{ day, format, masks, attributes }">
             <span class="popover">
               <IonButton
+                v-if="canEdit"
                 @click="deleteDate(attributes)"
                 size="small"
                 color="danger"

@@ -1,6 +1,6 @@
 {
   "name": "can-i-be-called",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
